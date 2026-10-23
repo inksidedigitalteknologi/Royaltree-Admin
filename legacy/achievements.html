@@ -16,43 +16,263 @@
             <header id="admin-topbar"></header>
             <main class="admin-content">
                 <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="bi bi-trophy"></i> Achievements</div></div>
+                    <div class="card-header">
+                        <div class="card-title"><i class="bi bi-trophy"></i> Achievements</div>
+                        <button class="btn btn-primary btn-sm" onclick="openAchModal()"><i class="bi bi-plus-lg"></i> Tambah</button>
+                    </div>
                     <div class="table-wrapper">
                         <table class="table">
-                            <thead><tr><th>ID</th><th>Name</th><th>Reward</th><th>Condition</th></tr></thead>
-                            <tbody id="achBody"><tr><td colspan="4" class="text-center text-muted" style="padding:40px;">Loading...</td></tr></tbody>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Reward</th>
+                                    <th>Condition</th>
+                                    <th>Status</th>
+                                    <th style="width:100px">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="achBody">
+                                <tr><td colspan="6" class="text-center text-muted" style="padding:40px;">Loading...</td></tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </main>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/ui.js"></script>
     <script src="assets/js/layout.js"></script>
     <script>
         AdminLayout.init('Achievements');
-        (async () => {
+
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        function formatReward(r) {
+            if (r == null) return '-';
+            if (typeof r === 'object') {
+                const parts = [];
+                if (typeof r.rtp === 'number' && r.rtp > 0) parts.push(r.rtp + ' RTP');
+                if (r.badge) parts.push('🏅 ' + String(r.badge).replace('badge_', '').replace(/_/g, ' '));
+                if (r.frame) parts.push('🖼️ ' + String(r.frame).replace('frame_', '').replace(/_/g, ' '));
+                return parts.length ? parts.join(' · ') : '-';
+            }
+            return String(r) + ' RTP';
+        }
+
+        function formatCondition(c) {
+            if (!c) return '-';
+            return `${c.field || '?'} ${c.type || ''} ${c.target ?? '?'}`.trim();
+        }
+
+        async function loadAchievements() {
+            const body = document.getElementById('achBody');
+            body.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:40px;">Loading...</td></tr>';
             try {
-                const res = await AdminAPI.request("/achievements");
+                const res = await AdminAPI.getAchievements();
                 const list = res.data || [];
-                const body = document.getElementById("achBody");
-                if (list.length === 0) { body.innerHTML = "<tr><td colspan=\"4\" class=\"text-center text-muted\" style=\"padding:40px;\">No achievements</td></tr>"; return; }
-                body.innerHTML = list.map(a => `<tr><td><code>${escapeHtml(a.id || "-")}</code></td><td>${escapeHtml(a.name || "-")}</td><td><strong class="text-gold">${(() => {
-                    const r = a.reward;
-                    if (r == null) return '-';
-                    if (typeof r === 'object') {
-                        const parts = [];
-                        if (typeof r.rtp === 'number') parts.push(r.rtp + ' RTP');
-                        if (r.badge) parts.push('🏅 ' + String(r.badge).replace('badge_', ''));
-                        if (r.frame) parts.push('🖼️ ' + String(r.frame).replace('frame_', ''));
-                        return parts.length ? parts.join(' · ') : '-';
-                    }
-                    return String(r) + ' RTP';
-                })()}</strong></td><td class="text-secondary">${a.condition ? (a.condition.field || "") + " " + (a.condition.type || "") + " " + (a.condition.target || "") : "-"}</td></tr>`).join("");
-            } catch (e) { document.getElementById("achBody").innerHTML = `<tr><td colspan="4" class="text-center text-danger">${e.message}</td></tr>`; }
-        })();
+                if (list.length === 0) {
+                    body.innerHTML = '<tr><td colspan="6" class="text-center text-muted" style="padding:40px;">Belum ada achievement</td></tr>';
+                    return;
+                }
+                body.innerHTML = list.map(a => {
+                    const status = a.active === false
+                        ? '<span class="cfg-badge cfg-badge-off">OFF</span>'
+                        : '<span class="cfg-badge cfg-badge-on">ON</span>';
+                    return `<tr>
+                        <td><code style="font-size:11px;">${escapeHtml(a.id || '-')}</code></td>
+                        <td>${escapeHtml(a.name || '-')}</td>
+                        <td><strong style="color:#F59E0B;">${formatReward(a.reward)}</strong></td>
+                        <td class="text-secondary" style="font-size:11px;">${escapeHtml(formatCondition(a.condition))}</td>
+                        <td>${status}</td>
+                        <td style="white-space:nowrap;">
+                            <button class="btn btn-sm" onclick="editAch('${escapeHtml(a.id)}')" title="Edit" style="padding:4px 8px;font-size:11px;"><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm" onclick="deleteAch('${escapeHtml(a.id)}')" title="Hapus" style="padding:4px 8px;font-size:11px;background:rgba(239,68,68,0.15);color:#F87171;border:none;"><i class="bi bi-trash"></i></button>
+                        </td>
+                    </tr>`;
+                }).join('');
+            } catch (e) {
+                body.innerHTML = `<tr><td colspan="6" class="text-center text-danger">${e.message}</td></tr>`;
+            }
+        }
+
+        function openAchModal(data = null) {
+            const isEdit = !!data;
+            const a = data || {
+                id: '', name: '', description: '', icon: '🏆', tier: 'COMMON', category: 'MINING',
+                order: 1, active: true,
+                reward: { rtp: 0, badge: '', frame: '' },
+                condition: { field: '', type: 'COUNT', target: 0 }
+            };
+            const html = `
+                <div class="cfg-modal-overlay show" id="achModal">
+                    <div class="cfg-modal" style="max-width:640px;max-height:90vh;overflow-y:auto;">
+                        <div class="cfg-modal-title">${isEdit ? 'Edit' : 'Tambah'} Achievement</div>
+                        <div class="cfg-modal-sub">${isEdit ? a.id : 'ID baru — harus unik'}</div>
+
+                        <div class="cfg-modal-group">
+                            <label class="cfg-modal-label">ID</label>
+                            <input class="cfg-modal-input" id="ach_id" value="${escapeHtml(a.id)}" ${isEdit ? 'readonly style="opacity:0.6;"' : ''}>
+                        </div>
+                        <div class="cfg-modal-group">
+                            <label class="cfg-modal-label">Nama</label>
+                            <input class="cfg-modal-input" id="ach_name" value="${escapeHtml(a.name)}">
+                        </div>
+                        <div class="cfg-modal-group">
+                            <label class="cfg-modal-label">Deskripsi</label>
+                            <input class="cfg-modal-input" id="ach_desc" value="${escapeHtml(a.description || '')}">
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Icon</label>
+                                <input class="cfg-modal-input" id="ach_icon" value="${escapeHtml(a.icon || '🏆')}">
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Order</label>
+                                <input type="number" class="cfg-modal-input" id="ach_order" value="${a.order || 1}">
+                            </div>
+                        </div>
+
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Tier</label>
+                                <select class="cfg-modal-input" id="ach_tier">
+                                    ${['COMMON','BRONZE','SILVER','GOLD','PLATINUM'].map(t => `<option value="${t}" ${a.tier === t ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Category</label>
+                                <select class="cfg-modal-input" id="ach_category">
+                                    ${['MINING','STEP','REFERRAL','GAME','WITHDRAW','CHAT','STREAK'].map(c => `<option value="${c}" ${a.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div style="margin:16px 0 8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Reward</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;">
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">RTP</label>
+                                <input type="number" step="0.001" class="cfg-modal-input" id="ach_rtp" value="${a.reward?.rtp || 0}">
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Badge</label>
+                                <input class="cfg-modal-input" id="ach_badge" value="${escapeHtml(a.reward?.badge || '')}" placeholder="badge_xxx">
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Frame</label>
+                                <input class="cfg-modal-input" id="ach_frame" value="${escapeHtml(a.reward?.frame || '')}" placeholder="frame_xxx">
+                            </div>
+                        </div>
+
+                        <div style="margin:16px 0 8px;font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Condition</div>
+                        <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:12px;">
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Field</label>
+                                <input class="cfg-modal-input" id="ach_field" value="${escapeHtml(a.condition?.field || '')}" placeholder="miningClaimCount">
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Type</label>
+                                <select class="cfg-modal-input" id="ach_type">
+                                    ${['COUNT','STREAK','MAX','TOTAL'].map(t => `<option value="${t}" ${a.condition?.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Target</label>
+                                <input type="number" class="cfg-modal-input" id="ach_target" value="${a.condition?.target || 0}">
+                            </div>
+                        </div>
+
+                        <div class="cfg-modal-group" style="margin-top:12px;">
+                            <label class="cfg-modal-label"><input type="checkbox" id="ach_active" ${a.active !== false ? 'checked' : ''}> Aktif</label>
+                        </div>
+
+                        <div class="cfg-modal-actions">
+                            <button class="btn btn-outline" onclick="closeAchModal()">Batal</button>
+                            <button class="btn btn-primary" onclick="saveAch(${isEdit ? 'true' : 'false'})"><i class="bi bi-check-lg"></i> Simpan</button>
+                        </div>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        function closeAchModal() {
+            const el = document.getElementById('achModal');
+            if (el) el.remove();
+        }
+
+        async function saveAch(isEdit) {
+            const body = {
+                id: document.getElementById('ach_id').value.trim(),
+                name: document.getElementById('ach_name').value.trim(),
+                description: document.getElementById('ach_desc').value.trim(),
+                icon: document.getElementById('ach_icon').value.trim(),
+                tier: document.getElementById('ach_tier').value,
+                category: document.getElementById('ach_category').value,
+                order: parseInt(document.getElementById('ach_order').value) || 1,
+                active: document.getElementById('ach_active').checked,
+                reward: {
+                    rtp: parseFloat(document.getElementById('ach_rtp').value) || 0,
+                    badge: document.getElementById('ach_badge').value.trim() || null,
+                    frame: document.getElementById('ach_frame').value.trim() || null
+                },
+                condition: {
+                    field: document.getElementById('ach_field').value.trim(),
+                    type: document.getElementById('ach_type').value,
+                    target: parseInt(document.getElementById('ach_target').value) || 0
+                }
+            };
+            if (!body.id || !body.name) { showToast('ID & Nama wajib diisi', 'warning'); return; }
+            try {
+                let res;
+                if (isEdit) {
+                    const { id, ...payload } = body;
+                    res = await AdminAPI.updateAchievement(id, payload);
+                } else {
+                    res = await AdminAPI.createAchievement(body);
+                }
+                if (res.success) {
+                    showToast((isEdit ? 'Updated' : 'Created') + ' ' + body.id, 'success');
+                    closeAchModal();
+                    loadAchievements();
+                } else {
+                    showToast('Gagal: ' + (res.message || 'Unknown'), 'error');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function editAch(id) {
+            try {
+                const res = await AdminAPI.getAchievement(id);
+                if (res.success && res.data) {
+                    openAchModal(res.data);
+                } else {
+                    showToast('Gagal load: ' + (res.message || 'Unknown'), 'error');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        async function deleteAch(id) {
+            if (!confirm('Hapus achievement "' + id + '"? Tindakan ini tidak bisa dibatalkan.')) return;
+            try {
+                const res = await AdminAPI.deleteAchievement(id);
+                if (res.success) {
+                    showToast('Deleted ' + id, 'success');
+                    loadAchievements();
+                } else {
+                    showToast('Gagal: ' + (res.message || 'Unknown'), 'error');
+                }
+            } catch (e) { showToast('Error: ' + e.message, 'error'); }
+        }
+
+        // Init
+        loadAchievements();
     </script>
 </body>
 </html>
