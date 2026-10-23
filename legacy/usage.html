@@ -36,7 +36,7 @@
             try {
                 const res = await AdminAPI.request("/firestore-usage");
                 if (res.success && res.data) {
-                    const d = res.data;
+                    const d = (res.data && res.data[0]) || res.data || {};
                     document.getElementById("u-reads").textContent = (d.reads || 0).toLocaleString();
                     document.getElementById("u-writes").textContent = (d.writes || 0).toLocaleString();
                     document.getElementById("u-deletes").textContent = (d.deletes || 0).toLocaleString();

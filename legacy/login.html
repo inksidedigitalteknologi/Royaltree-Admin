@@ -33,7 +33,7 @@
                     <label class="form-label">API Key</label>
                     <input type="password" class="form-input" id="apiKey" placeholder="Masukkan API key" required>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                <button type="submit" class="btn btn-primary w-100 btn-lg" id="loginBtn">
                     <i class="bi bi-box-arrow-in-right"></i> Login
                 </button>
                 <div id="error" class="text-danger mt-3" style="font-size: 13px;"></div>
@@ -51,16 +51,51 @@
             const password = document.getElementById('password').value;
             const apiKey = document.getElementById('apiKey').value;
             const errorEl = document.getElementById('error');
+            const btn = document.getElementById('loginBtn');
             errorEl.textContent = '';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+
             try {
-                const res = await AdminAPI.Auth.login(password, apiKey);
-                if (res.success) {
+                const res = await AdminAPI.login(password, apiKey);
+                console.log('[LOGIN] Response:', res);
+
+                if (res && res.success) {
+                    // ✅ SIMPAN TOKEN MANUAL
+                    if (res.token) {
+                        localStorage.setItem('royaltree_admin_token', res.token);
+                    } else {
+                        // Fallback: pakai apiKey sebagai token (kalau backend return apiKey)
+                        console.warn('[LOGIN] No token in response — fallback');
+                    }
+                    // Save admin name kalau ada
+                    if (res.name) {
+                        localStorage.setItem('royaltree_admin_name', res.name);
+                    }
+
+                    // Verifikasi token tersimpan
+                    const savedToken = localStorage.getItem('royaltree_admin_token');
+                    console.log('[LOGIN] Saved token:', savedToken ? savedToken.substring(0, 20) + '...' : 'NONE');
+
+                    if (!savedToken) {
+                        errorEl.textContent = 'Token tidak tersimpan. Cek response backend.';
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Login';
+                        return;
+                    }
+
+                    // Redirect
                     window.location.replace('index.html');
                 } else {
-                    errorEl.textContent = res.message || 'Login gagal';
+                    errorEl.textContent = (res && res.message) || 'Login gagal';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Login';
                 }
             } catch (err) {
+                console.error('[LOGIN] Error:', err);
                 errorEl.textContent = err.message || 'Network error';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Login';
             }
         });
     </script>

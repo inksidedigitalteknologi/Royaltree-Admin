@@ -39,7 +39,7 @@
                 const list = res.data || [];
                 const body = document.getElementById("achBody");
                 if (list.length === 0) { body.innerHTML = "<tr><td colspan=\"4\" class=\"text-center text-muted\" style=\"padding:40px;\">No achievements</td></tr>"; return; }
-                body.innerHTML = list.map(a => `<tr><td><code>${escapeHtml(a.id || "-")}</code></td><td>${escapeHtml(a.name || "-")}</td><td><strong class="text-gold">${a.reward || 0} RTP</strong></td><td class="text-secondary">${escapeHtml(a.condition || "-")}</td></tr>`).join("");
+                body.innerHTML = list.map(a => `<tr><td><code>${escapeHtml(a.id || "-")}</code></td><td>${escapeHtml(a.name || "-")}</td><td><strong class="text-gold">${(a.reward && a.reward.rtp) || a.reward || 0} RTP</strong></td><td class="text-secondary">${escapeHtml(a.condition || "-")}</td></tr>`).join("");
             } catch (e) { document.getElementById("achBody").innerHTML = `<tr><td colspan="4" class="text-center text-danger">${e.message}</td></tr>`; }
         })();
     </script>

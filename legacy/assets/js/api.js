@@ -208,8 +208,31 @@
   // ============ HELPERS ============
   window.AdminAPI = {
     Auth,
+    request,
     ...API,
     // Helper untuk format
+    escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    },
+    fmtNumber(n) {
+      if (n === null || n === undefined) return '0';
+      if (typeof n !== 'number') n = Number(n);
+      if (isNaN(n)) return '0';
+      return n.toLocaleString('id-ID');
+    },
+    toast(message, type = 'success') {
+      if (typeof window.showToast === 'function') {
+        window.showToast(message, type);
+      } else {
+        console.log('[TOAST]', type, message);
+      }
+    },
     fmtDate(ts) {
       if (!ts) return '-';
 

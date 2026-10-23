@@ -34,7 +34,7 @@
                 if (res.success && res.data) {
                     document.getElementById("miningContent").innerHTML = `
                         <div class="stat-grid">
-                            <div class="stat-card"><div class="stat-icon green"><i class="bi bi-coin"></i></div><div class="stat-value">${(res.data.poolFund || 0).toLocaleString()}</div><div class="stat-label">Pool Fund (RTP)</div></div>
+                            <div class="stat-card"><div class="stat-icon green"><i class="bi bi-coin"></i></div><div class="stat-value">${(res.data.balance || 0).toLocaleString()}</div><div class="stat-label">Pool Fund (RTP)</div></div>
                         </div>`;
                 }
             } catch (e) { document.getElementById("miningContent").innerHTML = `<div class="text-danger">${e.message}</div>`; }

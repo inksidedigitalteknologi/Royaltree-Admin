@@ -112,7 +112,7 @@
 
         window.loadConfig = async (type) => {
             try {
-                const res = await AdminAPI.request('/' + type + '-config');
+                const res = await AdminAPI.getConfig(type);
                 if (!res.success) { showToast('Gagal load: ' + res.message, 'error'); return; }
                 const d = res.data || {};
                 if (type === 'daily') {
@@ -155,7 +155,7 @@
                 };
             }
             try {
-                const res = await AdminAPI.request('/' + type + '-config', { method: 'PUT', body });
+                const res = await AdminAPI.saveConfig(type, body);
                 if (res.success) showToast(type.toUpperCase() + ' config saved', 'success');
                 else showToast('Gagal: ' + res.message, 'error');
             } catch (e) { showToast('Error: ' + e.message, 'error'); }

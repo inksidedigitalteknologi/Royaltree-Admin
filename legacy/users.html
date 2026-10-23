@@ -73,7 +73,7 @@
                         <td><strong>${escapeHtml(u.name || '-')}</strong></td>
                         <td class="text-secondary">${escapeHtml(u.email || '-')}</td>
                         <td><span class="badge badge-accent">${escapeHtml(u.tier || 'FREE')}</span></td>
-                        <td>${(u.points || 0).toLocaleString()} RTP</td>
+                        <td>${(u.balance || 0).toLocaleString()} RTP</td>
                         <td>${u.referredCount || 0}</td>
                         <td>
                             <a href="user-detail.html?uid=${u.id}" class="btn btn-sm btn-outline"><i class="bi bi-eye"></i></a>

@@ -36,7 +36,7 @@
         (async () => {
             try {
                 const res = await AdminAPI.request("/campaigns");
-                const list = res.data || [];
+                const list = res.campaigns || res.data || [];
                 const body = document.getElementById("campaignsBody");
                 if (list.length === 0) { body.innerHTML = "<tr><td colspan=\"4\" class=\"text-center text-muted\" style=\"padding:40px;\">No campaigns</td></tr>"; return; }
                 body.innerHTML = list.map(c => `<tr><td><code>${escapeHtml(c.id || "-")}</code></td><td>${escapeHtml(c.title || c.name || "-")}</td><td>${(c.budget || 0).toLocaleString()}</td><td><span class="badge badge-${c.status === "ACTIVE" ? "success" : "muted"}">${escapeHtml(c.status || "-")}</span></td></tr>`).join("");

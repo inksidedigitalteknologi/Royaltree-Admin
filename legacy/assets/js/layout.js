@@ -17,7 +17,6 @@
             section: 'Users & Finance',
             items: [
                 { href: 'users.html',       icon: 'people',            label: 'Users' },
-                { href: 'user-detail.html', icon: 'person-badge',      label: 'User Detail' },
                 { href: 'withdrawals.html', icon: 'cash-stack',        label: 'Withdrawals' }
             ]
         },
