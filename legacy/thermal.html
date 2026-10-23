@@ -42,9 +42,14 @@
                 <!-- Chart -->
                 <div class="card mb-4">
                     <div class="card-header">
-                        <div class="card-title"><i class="bi bi-graph-up"></i> Thermal Chart (7 Hari Terakhir)</div>
+                        <div class="card-title"><i class="bi bi-graph-up"></i> Thermal Chart <span id="thermalPeriodLabel" style="font-size:11px;color:var(--text-muted);font-weight:400;">(7 hari terakhir)</span></div>
+                        <select class="form-input" id="thermalPeriod" style="width:auto;padding:4px 8px;font-size:12px;" onchange="loadThermal()">
+                            <option value="7">7 hari</option>
+                            <option value="14">14 hari</option>
+                            <option value="30">30 hari</option>
+                        </select>
                     </div>
-                    <div id="thermalChart" style="padding: 20px;">
+                    <div id="thermalChart" style="padding: 8px;">
                         <div class="empty-state">
                             <div class="empty-state-icon"><i class="bi bi-graph-up"></i></div>
                             <div class="empty-state-title">Loading chart...</div>
@@ -86,8 +91,11 @@
         AdminLayout.init('Thermal');
 
         async function loadThermal() {
+            const period = document.getElementById('thermalPeriod')?.value || 7;
+            const label = document.getElementById('thermalPeriodLabel');
+            if (label) label.textContent = `(${period} hari terakhir)`;
             try {
-                const res = await AdminAPI.request('/thermal-stats');
+                const res = await AdminAPI.request('/thermal-stats?days=' + (document.getElementById('thermalPeriod')?.value || 7));
                 if (!res.success || !res.data) {
                     document.getElementById('thermalBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal load data</td></tr>';
                     return;
@@ -112,14 +120,14 @@
                 // Chart (simple bar)
                 const maxAvg = Math.max(...daily.map(d => d.avgTemp || 0), 1);
                 document.getElementById('thermalChart').innerHTML = `
-                    <div style="display: flex; align-items: flex-end; gap: 12px; height: 200px; padding: 20px 0;">
+                    <div style="display: flex; align-items: flex-end; gap: 6px; height: 100px; padding: 8px 0;">
                         ${daily.map(d => {
-                            const height = ((d.avgTemp || 0) / maxAvg) * 150;
+                            const height = ((d.avgTemp || 0) / maxAvg) * 70;
                             const color = d.avgTemp > 40 ? '#EF4444' : d.avgTemp > 35 ? '#F59E0B' : '#10B981';
                             return `
                                 <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
                                     <div style="font-size: 10px; color: var(--text-muted);">${d.avgTemp}°</div>
-                                    <div style="width: 100%; height: ${height}px; background: linear-gradient(180deg, ${color}, ${color}80); border-radius: 8px 8px 0 0; transition: all 0.3s;" title="${d.date}: avg ${d.avgTemp}°C, max ${d.maxTemp}°C"></div>
+                                    <div style="width: 100%; height: ${height}px; background: linear-gradient(180deg, ${color}, ${color}80); border-radius: 4px 4px 0 0; transition: all 0.3s;" title="${d.date}: avg ${d.avgTemp}°C, max ${d.maxTemp}°C"></div>
                                     <div style="font-size: 9px; color: var(--text-muted); white-space: nowrap;">${d.date.slice(5)}</div>
                                 </div>
                             `;
