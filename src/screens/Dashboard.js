@@ -44,13 +44,18 @@ async function loadScreen(screen) {
   try {
     if (screen === 'dashboard') {
       const stats = await api.stats()
+      const s = stats.data || stats
       content.innerHTML = `
         <h2 class="text-2xl font-bold mb-6">📊 Dashboard</h2>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="card"><div class="text-slate-400 text-sm">Total Users</div><div class="text-2xl font-bold text-royal-500">${stats.data?.totalUsers || 0}</div></div>
-          <div class="card"><div class="text-slate-400 text-sm">Total Withdrawals</div><div class="text-2xl font-bold text-green-500">${stats.data?.totalWithdrawals || 0}</div></div>
-          <div class="card"><div class="text-slate-400 text-sm">Pending Withdrawals</div><div class="text-2xl font-bold text-yellow-500">${stats.data?.pendingWithdrawals || 0}</div></div>
-          <div class="card"><div class="text-slate-400 text-sm">Total RTP</div><div class="text-2xl font-bold text-purple-500">${stats.data?.totalRtp || 0}</div></div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="card"><div class="text-slate-400 text-sm">Total Users</div><div class="text-2xl font-bold text-royal-500">${(s.totalUsers || 0).toLocaleString()}</div></div>
+          <div class="card"><div class="text-slate-400 text-sm">Total RTP</div><div class="text-2xl font-bold text-purple-500">${(s.totalRTP || 0).toLocaleString()}</div></div>
+          <div class="card"><div class="text-slate-400 text-sm">Pending Withdrawals</div><div class="text-2xl font-bold text-yellow-500">${s.pendingWithdrawals || 0}</div></div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <div class="card"><div class="text-slate-400 text-sm">Total Miners</div><div class="text-2xl font-bold text-green-500">${(s.totalMiners || 0).toLocaleString()}</div></div>
+          <div class="card"><div class="text-slate-400 text-sm">Active Miners</div><div class="text-2xl font-bold text-emerald-500">${s.activeMiners || 0}</div></div>
+          <div class="card"><div class="text-slate-400 text-sm">Total Transactions</div><div class="text-2xl font-bold text-blue-500">${(s.totalTransactions || 0).toLocaleString()}</div></div>
         </div>
       `
     } else if (screen === 'users') {
