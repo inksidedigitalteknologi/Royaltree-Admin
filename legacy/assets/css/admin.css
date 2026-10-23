@@ -225,3 +225,63 @@ body {
 .w-100 { width: 100%; }
 .h-100 { height: 100%; }
 .hidden { display: none !important; }
+
+/* ============================================================
+   CONFIG UI v2.0 — card layout, modal, save bar (v1.16)
+   ============================================================ */
+.cfg-wrap { display: flex; flex-direction: column; gap: 16px; }
+.cfg-section { background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.cfg-section-title { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.cfg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.cfg-card { background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 10px; padding: 16px; position: relative; transition: border-color 0.15s, transform 0.15s; }
+.cfg-card:hover { border-color: var(--border-light); transform: translateY(-1px); }
+.cfg-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.cfg-card-emoji { font-size: 24px; }
+.cfg-card-edit { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; border-radius: 6px; transition: all 0.15s; }
+.cfg-card-edit:hover { background: var(--bg-secondary); color: var(--accent); }
+.cfg-card-name { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px; }
+.cfg-card-sub { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.cfg-card-value { font-size: 20px; font-weight: 800; color: var(--text-primary); margin-top: 8px; }
+.cfg-card-value.gold { color: #F59E0B; }
+.cfg-card-value.green { color: #10B981; }
+.cfg-card-value.blue { color: #3B82F6; }
+.cfg-card-value.red { color: #EF4444; }
+.cfg-card-note { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+.cfg-badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.cfg-badge-on { background: rgba(16,185,129,0.15); color: #34D399; }
+.cfg-badge-off { background: rgba(239,68,68,0.15); color: #F87171; }
+.cfg-badge-gold { background: rgba(245,158,11,0.15); color: #FBBF24; }
+.cfg-tier-starter  { background: linear-gradient(135deg, #1E293B 0%, #0F172A 100%); border-color: #334155; }
+.cfg-tier-bronze   { background: linear-gradient(135deg, #3F2D1E 0%, #1E1610 100%); border-color: #8B5A2B; }
+.cfg-tier-silver   { background: linear-gradient(135deg, #334155 0%, #1E293B 100%); border-color: #94A3B8; }
+.cfg-tier-gold     { background: linear-gradient(135deg, #3F351E 0%, #1E1810 100%); border-color: #F59E0B; }
+.cfg-tier-platinum { background: linear-gradient(135deg, #1E2F3F 0%, #0F1A24 100%); border-color: #06B6D4; }
+.cfg-tier-royal    { background: linear-gradient(135deg, #3F1E3F 0%, #1E0F1E 100%); border-color: #A855F7; }
+.cfg-tier-vip      { background: linear-gradient(135deg, #2F1E3F 0%, #1A0F24 100%); border-color: #8B5CF6; }
+.cfg-tier-premium  { background: linear-gradient(135deg, #1E3F2F 0%, #0F2418 100%); border-color: #10B981; }
+.cfg-tier-free     { background: var(--bg-tertiary); border-color: var(--border); }
+.cfg-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; padding: 20px; }
+.cfg-modal-overlay.show { display: flex; }
+.cfg-modal { background: var(--bg-secondary); border: 1px solid var(--border-light); border-radius: 16px; width: 100%; max-width: 480px; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); animation: cfgModalIn 0.2s ease; }
+@keyframes cfgModalIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: none; } }
+.cfg-modal-title { font-size: 18px; font-weight: 800; margin-bottom: 4px; }
+.cfg-modal-sub { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+.cfg-modal-group { margin-bottom: 14px; }
+.cfg-modal-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+.cfg-modal-input { width: 100%; padding: 10px 12px; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 14px; }
+.cfg-modal-input:focus { outline: none; border-color: var(--accent); }
+.cfg-modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+.cfg-save-bar { position: sticky; bottom: 0; background: var(--bg-secondary); border-top: 1px solid var(--border); padding: 12px 20px; display: flex; align-items: center; justify-content: space-between; border-radius: 0 0 12px 12px; margin: 16px -20px -20px; z-index: 10; }
+.cfg-save-bar .cfg-save-info { font-size: 12px; color: var(--text-muted); }
+.cfg-toggle { position: relative; display: inline-block; width: 44px; height: 24px; }
+.cfg-toggle input { opacity: 0; width: 0; height: 0; }
+.cfg-toggle-slider { position: absolute; cursor: pointer; inset: 0; background: var(--bg-tertiary); border: 1px solid var(--border); border-radius: 24px; transition: 0.2s; }
+.cfg-toggle-slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 2px; bottom: 2px; background: var(--text-muted); border-radius: 50%; transition: 0.2s; }
+.cfg-toggle input:checked + .cfg-toggle-slider { background: rgba(16,185,129,0.3); border-color: #10B981; }
+.cfg-toggle input:checked + .cfg-toggle-slider:before { transform: translateX(20px); background: #10B981; }
+.cfg-preview { background: var(--bg-tertiary); border: 1px dashed var(--border-light); border-radius: 10px; padding: 14px; font-size: 13px; color: var(--text-secondary); }
+.cfg-preview strong { color: var(--text-primary); }
+.cfg-preview-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); }
+.cfg-preview-row:last-child { border-bottom: none; }
+.cfg-odds-bar { height: 8px; background: var(--bg-primary); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+.cfg-odds-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--info)); border-radius: 4px; transition: width 0.3s; }
