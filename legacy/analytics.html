@@ -36,10 +36,11 @@
             try {
                 const res = await AdminAPI.request("/stats");
                 if (res.success && res.data) {
-                    const d = res.data;
-                    document.getElementById("a-users").textContent = (d.totalUsers || 0).toLocaleString();
-                    document.getElementById("a-rtp").textContent = (d.totalRTP || 0).toLocaleString();
-                    document.getElementById("a-pending").textContent = (d.pendingWithdrawals || 0).toLocaleString();
+                    const d = res.data || {};
+                    const s = d.summary || d;
+                    document.getElementById("a-users").textContent = (s.totalUsers || 0).toLocaleString();
+                    document.getElementById("a-rtp").textContent = (s.totalRTP || 0).toLocaleString();
+                    document.getElementById("a-pending").textContent = (s.pendingWithdrawals || 0).toLocaleString();
                 }
             } catch (e) { showToast(e.message, "error"); }
         })();

@@ -36,7 +36,7 @@
         (async () => {
             try {
                 const res = await AdminAPI.request("/chat/messages");
-                const list = res.data || [];
+                const list = res.messages || res.data || [];
                 const body = document.getElementById("chatBody");
                 if (list.length === 0) { body.innerHTML = "<tr><td colspan=\"4\" class=\"text-center text-muted\" style=\"padding:40px;\">No messages</td></tr>"; return; }
                 body.innerHTML = list.map(m => `<tr><td>${escapeHtml(m.userName || m.userId || "-")}</td><td>${escapeHtml(m.message || "-")}</td><td class="text-secondary">${m.timestamp ? new Date(m.timestamp).toLocaleString("id-ID") : "-"}</td><td><button class="btn btn-sm btn-danger" onclick="delChat(\"${m.id}\")"><i class="bi bi-trash"></i></button></td></tr>`).join("");

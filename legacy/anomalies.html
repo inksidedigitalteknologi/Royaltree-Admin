@@ -36,7 +36,7 @@
         (async () => {
             try {
                 const res = await AdminAPI.request("/anomalies");
-                const list = res.data || [];
+                const list = res.anomalies || res.data || [];
                 const body = document.getElementById("anomaliesBody");
                 if (list.length === 0) { body.innerHTML = "<tr><td colspan=\"4\" class=\"text-center text-muted\" style=\"padding:40px;\">No anomalies</td></tr>"; return; }
                 body.innerHTML = list.map(a => {
