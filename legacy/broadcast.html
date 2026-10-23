@@ -15,32 +15,299 @@
         <div class="admin-main">
             <header id="admin-topbar"></header>
             <main class="admin-content">
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="bi bi-send"></i> Broadcast Notification</div></div>
-                    <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="bc_title" placeholder="Judul notifikasi"></div>
-                    <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="bc_message" rows="4" placeholder="Isi notifikasi"></textarea></div>
-                    <button class="btn btn-primary" onclick="sendBroadcast()"><i class="bi bi-send"></i> Kirim ke Semua User</button>
+                <div class="row g-4">
+                    <!-- LEFT: Form -->
+                    <div class="col-lg-7">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="bi bi-send"></i> Kirim Broadcast</div>
+                            </div>
+
+                            <!-- Type -->
+                            <div class="form-group">
+                                <label class="form-label">Tipe Notifikasi</label>
+                                <select class="form-input" id="bc_type">
+                                    <option value="INFO">ℹ️ Info</option>
+                                    <option value="PROMO">🎉 Promo</option>
+                                    <option value="WARNING">⚠️ Warning</option>
+                                    <option value="MAINTENANCE">🔧 Maintenance</option>
+                                </select>
+                            </div>
+
+                            <!-- Title -->
+                            <div class="form-group">
+                                <label class="form-label">Judul</label>
+                                <input type="text" class="form-input" id="bc_title" placeholder="Judul notifikasi" maxlength="80">
+                                <div class="form-hint" id="titleCount">0/80</div>
+                            </div>
+
+                            <!-- Message -->
+                            <div class="form-group">
+                                <label class="form-label">Pesan</label>
+                                <textarea class="form-input" id="bc_message" rows="4" placeholder="Isi notifikasi" maxlength="300"></textarea>
+                                <div class="form-hint" id="msgCount">0/300</div>
+                            </div>
+
+                            <!-- Target -->
+                            <div class="form-group">
+                                <label class="form-label">Target</label>
+                                <select class="form-input" id="bc_target">
+                                    <option value="ALL">📢 Semua User</option>
+                                    <option value="TIER">👑 Tier Tertentu</option>
+                                    <option value="UID">👤 User Tertentu (UID)</option>
+                                </select>
+                            </div>
+
+                            <!-- Tier selector -->
+                            <div class="form-group" id="tierGroup" style="display:none;">
+                                <label class="form-label">Pilih Tier</label>
+                                <select class="form-input" id="bc_tier">
+                                    <option value="FREE">FREE</option>
+                                    <option value="STARTER">STARTER</option>
+                                    <option value="PREMIUM">PREMIUM</option>
+                                    <option value="VIP">VIP</option>
+                                    <option value="ROYAL">ROYAL</option>
+                                </select>
+                            </div>
+
+                            <!-- UID input -->
+                            <div class="form-group" id="uidGroup" style="display:none;">
+                                <label class="form-label">UID User</label>
+                                <input type="text" class="form-input" id="bc_uid" placeholder="UID user">
+                            </div>
+
+                            <!-- Templates -->
+                            <div class="form-group">
+                                <label class="form-label">Template Cepat</label>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="useTemplate('promo')">🎉 Promo</button>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="useTemplate('maintenance')">🔧 Maintenance</button>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="useTemplate('welcome')">👋 Welcome</button>
+                                    <button type="button" class="btn btn-sm btn-outline" onclick="useTemplate('warning')">⚠️ Warning</button>
+                                </div>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="d-flex gap-2 mt-4">
+                                <button class="btn btn-primary btn-lg" onclick="sendBroadcast()">
+                                    <i class="bi bi-send-fill"></i> Kirim Sekarang
+                                </button>
+                                <button class="btn btn-outline btn-lg" onclick="resetForm()">
+                                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT: Preview -->
+                    <div class="col-lg-5">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title"><i class="bi bi-phone"></i> Preview</div>
+                            </div>
+                            <div style="padding: 20px; background: #0B1220; border-radius: 12px;">
+                                <div style="background: #1E293B !important; color: #F8FAFC !important; border: 1px solid #334155 !important; border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.4);">
+                                    <div style="display: flex; align-items: start; gap: 12px;">
+                                        <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #F59E0B, #3B82F6); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;" id="previewIcon">ℹ️</div>
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                                                <div style="font-weight: 700; font-size: 13px; color: #F8FAFC !important;">Royaltree</div>
+                                                <div style="font-size: 11px; color: #64748B !important;">now</div>
+                                            </div>
+                                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #F8FAFC !important;" id="previewTitle">Judul notifikasi</div>
+                                            <div style="font-size: 12px; color: #94A3B8 !important;" id="previewMessage">Isi notifikasi akan muncul di sini.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Recent Broadcasts -->
+                            <div class="mt-4">
+                                <label class="form-label">Broadcast Terakhir</label>
+                                <div id="recentBroadcasts">
+                                    <div class="empty-state" style="padding: 20px;">
+                                        <div class="empty-state-icon" style="font-size: 32px;"><i class="bi bi-inbox"></i></div>
+                                        <div class="empty-state-desc" style="font-size: 12px;">Belum ada broadcast</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/ui.js"></script>
     <script src="assets/js/layout.js"></script>
     <script>
         AdminLayout.init('Broadcast');
-        window.sendBroadcast = async () => {
-            const title = document.getElementById("bc_title").value.trim();
-            const message = document.getElementById("bc_message").value.trim();
-            if (!title || !message) { showToast("Title & message wajib", "warning"); return; }
-            if (!confirm("Kirim broadcast ke semua user?")) return;
-            try {
-                const res = await AdminAPI.request("/notifications/broadcast", { method: "POST", body: { title, message } });
-                if (res.success) { showToast("Broadcast terkirim", "success"); document.getElementById("bc_title").value = ""; document.getElementById("bc_message").value = ""; }
-                else showToast(res.message || "Gagal", "error");
-            } catch (e) { showToast(e.message, "error"); }
+
+        const typeIcons = {
+            'INFO': 'ℹ️',
+            'PROMO': '🎉',
+            'WARNING': '⚠️',
+            'MAINTENANCE': '🔧'
         };
+
+        const templates = {
+            promo: {
+                type: 'PROMO',
+                title: 'Promo Spesial Hari Ini!',
+                message: 'Dapatkan bonus RTP hingga 50% untuk semua pembelian miner! Buruan sebelum habis.'
+            },
+            maintenance: {
+                type: 'MAINTENANCE',
+                title: 'Maintenance Terjadwal',
+                message: 'Server akan maintenance pada 23:00-01:00 WIB. Mohon maaf atas ketidaknyamanannya.'
+            },
+            welcome: {
+                type: 'INFO',
+                title: 'Selamat Datang di Royaltree!',
+                message: 'Mulai kumpulkan RTP dengan check-in harian, misi, dan referral. Selamat bergabung!'
+            },
+            warning: {
+                type: 'WARNING',
+                title: 'Peringatan Keamanan',
+                message: 'Jangan bagikan OTP atau password Anda kepada siapapun. Tim Royaltree tidak pernah meminta data pribadi.'
+            }
+        };
+
+        function updatePreview() {
+            const type = document.getElementById('bc_type').value;
+            const title = document.getElementById('bc_title').value || 'Judul notifikasi';
+            const message = document.getElementById('bc_message').value || 'Isi notifikasi akan muncul di sini.';
+
+            document.getElementById('previewIcon').textContent = typeIcons[type] || 'ℹ️';
+            document.getElementById('previewTitle').textContent = title;
+            document.getElementById('previewMessage').textContent = message;
+        }
+
+        function updateCounts() {
+            const title = document.getElementById('bc_title').value;
+            const message = document.getElementById('bc_message').value;
+            document.getElementById('titleCount').textContent = title.length + '/80';
+            document.getElementById('msgCount').textContent = message.length + '/300';
+        }
+
+        function useTemplate(key) {
+            const t = templates[key];
+            if (!t) return;
+            document.getElementById('bc_type').value = t.type;
+            document.getElementById('bc_title').value = t.title;
+            document.getElementById('bc_message').value = t.message;
+            updatePreview();
+            updateCounts();
+        }
+
+        function resetForm() {
+            document.getElementById('bc_type').value = 'INFO';
+            document.getElementById('bc_title').value = '';
+            document.getElementById('bc_message').value = '';
+            document.getElementById('bc_target').value = 'ALL';
+            document.getElementById('tierGroup').style.display = 'none';
+            document.getElementById('uidGroup').style.display = 'none';
+            updatePreview();
+            updateCounts();
+        }
+
+        // Target change
+        document.getElementById('bc_target').addEventListener('change', (e) => {
+            const v = e.target.value;
+            document.getElementById('tierGroup').style.display = v === 'TIER' ? 'block' : 'none';
+            document.getElementById('uidGroup').style.display = v === 'UID' ? 'block' : 'none';
+        });
+
+        // Preview update
+        ['bc_type', 'bc_title', 'bc_message'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                updatePreview();
+                updateCounts();
+            });
+            document.getElementById(id).addEventListener('change', updatePreview);
+        });
+
+        // Send
+        async function sendBroadcast() {
+            const title = document.getElementById('bc_title').value.trim();
+            const message = document.getElementById('bc_message').value.trim();
+            const type = document.getElementById('bc_type').value;
+            const target = document.getElementById('bc_target').value;
+
+            if (!title || !message) {
+                showToast('Judul & pesan wajib diisi', 'warning');
+                return;
+            }
+
+            let targetDesc = 'semua user';
+            if (target === 'TIER') {
+                targetDesc = 'tier ' + document.getElementById('bc_tier').value;
+            } else if (target === 'UID') {
+                targetDesc = 'UID ' + document.getElementById('bc_uid').value;
+            }
+
+            if (!confirm(`Kirim broadcast ke ${targetDesc}?`)) return;
+
+            try {
+                const body = { title, message, type };
+                if (target === 'TIER') body.targetTier = document.getElementById('bc_tier').value;
+                if (target === 'UID') body.targetUid = document.getElementById('bc_uid').value;
+
+                const res = await AdminAPI.request('/notifications/broadcast', { method: 'POST', body });
+
+                if (res.success) {
+                    showToast('Broadcast terkirim!', 'success');
+                    addRecentBroadcast({ title, message, type, sentAt: Date.now() });
+                    resetForm();
+                } else {
+                    showToast('Gagal: ' + (res.message || 'Unknown error'), 'error');
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        // Recent broadcasts (localStorage)
+        function getRecentBroadcasts() {
+            try {
+                return JSON.parse(localStorage.getItem('royaltree_recent_broadcasts') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function addRecentBroadcast(item) {
+            const list = getRecentBroadcasts();
+            list.unshift(item);
+            if (list.length > 5) list.pop();
+            localStorage.setItem('royaltree_recent_broadcasts', JSON.stringify(list));
+            renderRecentBroadcasts();
+        }
+
+        function renderRecentBroadcasts() {
+            const list = getRecentBroadcasts();
+            const el = document.getElementById('recentBroadcasts');
+            if (list.length === 0) {
+                el.innerHTML = '<div class="empty-state" style="padding: 20px;"><div class="empty-state-icon" style="font-size: 32px;"><i class="bi bi-inbox"></i></div><div class="empty-state-desc" style="font-size: 12px;">Belum ada broadcast</div></div>';
+                return;
+            }
+            el.innerHTML = list.map(b => `
+                <div class="pack-card" style="margin-bottom: 8px; padding: 12px;">
+                    <span class="pack-card-icon" style="font-size: 20px;">${typeIcons[b.type] || 'ℹ️'}</span>
+                    <div class="pack-card-info">
+                        <div class="pack-card-name" style="font-size: 13px;">${escapeHtml(b.title)}</div>
+                        <div class="pack-card-desc" style="font-size: 10px;">${new Date(b.sentAt).toLocaleString('id-ID')}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Init
+        updatePreview();
+        updateCounts();
+        renderRecentBroadcasts();
     </script>
 </body>
 </html>

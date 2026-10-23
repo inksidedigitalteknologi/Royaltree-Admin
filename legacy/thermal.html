@@ -15,27 +15,141 @@
         <div class="admin-main">
             <header id="admin-topbar"></header>
             <main class="admin-content">
+                <!-- Summary Cards -->
+                <div class="stat-grid" id="thermalSummary">
+                    <div class="stat-card">
+                        <div class="stat-icon amber"><i class="bi bi-thermometer-half"></i></div>
+                        <div class="stat-value" id="statAvgTemp">-</div>
+                        <div class="stat-label">Rata-rata Suhu (°C)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red"><i class="bi bi-fire"></i></div>
+                        <div class="stat-value" id="statMaxTemp">-</div>
+                        <div class="stat-label">Suhu Tertinggi (°C)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue"><i class="bi bi-calendar-check"></i></div>
+                        <div class="stat-value" id="statDays">-</div>
+                        <div class="stat-label">Hari Data</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green"><i class="bi bi-activity"></i></div>
+                        <div class="stat-value" id="statTotalSamples">-</div>
+                        <div class="stat-label">Total Sampel</div>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <div class="card-title"><i class="bi bi-graph-up"></i> Thermal Chart (7 Hari Terakhir)</div>
+                    </div>
+                    <div id="thermalChart" style="padding: 20px;">
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="bi bi-graph-up"></i></div>
+                            <div class="empty-state-title">Loading chart...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Table -->
                 <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="bi bi-thermometer-half"></i> Thermal Stats</div></div>
-                    <div id="thermalContent"><div class="empty-state"><div class="empty-state-icon"><i class="bi bi-thermometer"></i></div><div class="empty-state-title">Loading...</div></div></div>
+                    <div class="card-header">
+                        <div class="card-title"><i class="bi bi-table"></i> Daily Breakdown</div>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Avg Temp</th>
+                                    <th>Max Temp</th>
+                                    <th>Sampel</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="thermalBody">
+                                <tr><td colspan="5" class="text-center text-muted" style="padding: 40px;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </main>
         </div>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/api.js"></script>
     <script src="assets/js/ui.js"></script>
     <script src="assets/js/layout.js"></script>
     <script>
         AdminLayout.init('Thermal');
-        (async () => {
+
+        async function loadThermal() {
             try {
-                const res = await AdminAPI.request("/thermal-stats");
-                if (res.success && res.data) {
-                    document.getElementById("thermalContent").innerHTML = "<pre style=\"color:var(--text-secondary);font-size:12px;\">" + JSON.stringify(res.data, null, 2) + "</pre>";
+                const res = await AdminAPI.request('/thermal-stats');
+                if (!res.success || !res.data) {
+                    document.getElementById('thermalBody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Gagal load data</td></tr>';
+                    return;
                 }
-            } catch (e) { document.getElementById("thermalContent").innerHTML = `<div class="text-danger">${e.message}</div>`; }
-        })();
+
+                const daily = res.data.daily || [];
+                if (daily.length === 0) {
+                    document.getElementById('thermalBody').innerHTML = '<tr><td colspan="5" class="text-center text-muted" style="padding: 40px;">Belum ada data thermal</td></tr>';
+                    return;
+                }
+
+                // Summary
+                const totalSamples = daily.reduce((sum, d) => sum + (d.count || 0), 0);
+                const avgTemp = daily.reduce((sum, d) => sum + (d.avgTemp || 0), 0) / daily.length;
+                const maxTemp = Math.max(...daily.map(d => d.maxTemp || 0));
+
+                document.getElementById('statAvgTemp').textContent = avgTemp.toFixed(1);
+                document.getElementById('statMaxTemp').textContent = maxTemp.toFixed(1);
+                document.getElementById('statDays').textContent = daily.length;
+                document.getElementById('statTotalSamples').textContent = totalSamples.toLocaleString();
+
+                // Chart (simple bar)
+                const maxAvg = Math.max(...daily.map(d => d.avgTemp || 0), 1);
+                document.getElementById('thermalChart').innerHTML = `
+                    <div style="display: flex; align-items: flex-end; gap: 12px; height: 200px; padding: 20px 0;">
+                        ${daily.map(d => {
+                            const height = ((d.avgTemp || 0) / maxAvg) * 150;
+                            const color = d.avgTemp > 40 ? '#EF4444' : d.avgTemp > 35 ? '#F59E0B' : '#10B981';
+                            return `
+                                <div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                                    <div style="font-size: 10px; color: var(--text-muted);">${d.avgTemp}°</div>
+                                    <div style="width: 100%; height: ${height}px; background: linear-gradient(180deg, ${color}, ${color}80); border-radius: 8px 8px 0 0; transition: all 0.3s;" title="${d.date}: avg ${d.avgTemp}°C, max ${d.maxTemp}°C"></div>
+                                    <div style="font-size: 9px; color: var(--text-muted); white-space: nowrap;">${d.date.slice(5)}</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+
+                // Table
+                document.getElementById('thermalBody').innerHTML = daily.map(d => {
+                    const status = d.avgTemp > 40 ? 'CRITICAL' : d.avgTemp > 35 ? 'WARNING' : 'NORMAL';
+                    const statusClass = status === 'CRITICAL' ? 'danger' : status === 'WARNING' ? 'warning' : 'success';
+                    return `
+                        <tr>
+                            <td><strong>${d.date}</strong></td>
+                            <td><span style="color: ${d.avgTemp > 40 ? '#EF4444' : d.avgTemp > 35 ? '#F59E0B' : '#10B981'}; font-weight: 700;">${d.avgTemp}°C</span></td>
+                            <td><span style="color: #EF4444; font-weight: 700;">${d.maxTemp}°C</span></td>
+                            <td>${(d.count || 0).toLocaleString()}</td>
+                            <td><span class="badge badge-${statusClass}">${status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (e) {
+                console.error('Thermal error:', e);
+                document.getElementById('thermalBody').innerHTML = `<tr><td colspan="5" class="text-center text-danger">${e.message}</td></tr>`;
+                if (window.showToast) showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        loadThermal();
     </script>
 </body>
 </html>
