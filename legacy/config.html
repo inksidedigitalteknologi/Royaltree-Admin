@@ -54,6 +54,26 @@
             <i class="bi bi-shield-exclamation me-1"></i>System
           </button>
         </li>
+        <li class="nav-item">
+          <button class="nav-link" data-tab="shop">
+            <i class="bi bi-shop me-1"></i>Shop
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-tab="referral">
+            <i class="bi bi-people me-1"></i>Referral
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-tab="transfer">
+            <i class="bi bi-send me-1"></i>Transfer
+          </button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" data-tab="spin">
+            <i class="bi bi-suit-spade me-1"></i>Spin
+          </button>
+        </li>
       </ul>
 
       <!-- Tab: System -->
@@ -328,6 +348,282 @@
         </div>
       </div>
 
+      <!-- Tab: Shop -->
+      <!-- Tab: Shop -->
+      <div class="tab-content" id="shopTab" style="display:none; padding: 16px;">
+        <!-- Tier Section -->
+        <div class="shop-section">
+          <div class="shop-section-header">
+            <div class="shop-section-title">
+              <i class="bi bi-crown"></i> Tier Akun
+            </div>
+            <span class="shop-section-badge">4 Tier</span>
+          </div>
+          <div class="row g-3" id="shop-tier-grid"></div>
+        </div>
+
+        <!-- RTP Pack Section -->
+        <div class="shop-section">
+          <div class="shop-section-header">
+            <div class="shop-section-title">
+              <i class="bi bi-coin"></i> RTP Pack
+            </div>
+            <span class="shop-section-badge">4 Paket</span>
+          </div>
+          <div id="shop-rtp-grid"></div>
+        </div>
+
+        <!-- Miner Pack Section -->
+        <div class="shop-section">
+          <div class="shop-section-header">
+            <div class="shop-section-title">
+              <i class="bi bi-hammer"></i> Miner Pack
+            </div>
+            <span class="shop-section-badge">4 Paket</span>
+          </div>
+          <div id="shop-miner-grid"></div>
+        </div>
+
+        <!-- Bundle Section -->
+        <div class="shop-section">
+          <div class="shop-section-header">
+            <div class="shop-section-title">
+              <i class="bi bi-gift"></i> Bundle
+            </div>
+            <span class="shop-section-badge">3 Paket</span>
+          </div>
+          <div id="shop-bundle-grid"></div>
+        </div>
+
+        <!-- Save Bar -->
+        <div class="shop-save-bar">
+          <span class="shop-save-bar-text">💡 Klik Edit untuk ubah harga & detail</span>
+          <div class="d-flex gap-2">
+            <button class="btn btn-success" onclick="saveConfig('shop')">
+              <i class="bi bi-save me-2"></i>Simpan Shop Config
+            </button>
+            <button class="btn btn-outline-secondary" onclick="loadConfig('shop')">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Edit -->
+      <div class="shop-modal-overlay" id="shopModal">
+        <div class="shop-modal">
+          <div class="shop-modal-header">
+            <div class="shop-modal-title" id="shopModalTitle">Edit</div>
+            <button class="shop-modal-close" onclick="closeShopModal()">×</button>
+          </div>
+          <div id="shopModalBody"></div>
+          <div class="shop-modal-actions">
+            <button class="shop-modal-btn shop-modal-btn-cancel" onclick="closeShopModal()">Batal</button>
+            <button class="shop-modal-btn shop-modal-btn-save" onclick="applyShopModal()">Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Referral -->
+      <div class="tab-content" id="referralTab" style="display:none;">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-people text-info me-2"></i>Referral Config
+            </h6>
+            <div class="alert alert-info small">
+              <i class="bi bi-info-circle me-1"></i>
+              Syarat tier = tier minimum user yang diundang agar referral valid.
+            </div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Syarat Tier Referral Valid</label>
+                <select class="form-select" id="referral_syaratTier">
+                  <option value="STARTER">STARTER</option>
+                  <option value="PREMIUM" selected>PREMIUM</option>
+                  <option value="VIP">VIP</option>
+                  <option value="ROYAL">ROYAL</option>
+                </select>
+                <div class="form-text small">Referral baru valid jika user diundang sudah tier ini</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Order (1-5)</label>
+                <input type="number" class="form-control" id="referral_syaratOrder" min="1" max="5">
+              </div>
+
+              <div class="col-12"><hr class="my-2"></div>
+
+              <div class="col-12">
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Komisi per Tier Referral</h6>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">🌱 Starter (0 referral)</label>
+                <input type="number" class="form-control" id="referral_tier_starter_commission" placeholder="0">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">🥉 Bronze (1-10)</label>
+                <input type="number" class="form-control" id="referral_tier_bronze_commission" placeholder="10">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">🥈 Silver (11-25)</label>
+                <input type="number" class="form-control" id="referral_tier_silver_commission" placeholder="15">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">🥇 Gold (26-100)</label>
+                <input type="number" class="form-control" id="referral_tier_gold_commission" placeholder="20">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">💎 Platinum (101+)</label>
+                <input type="number" class="form-control" id="referral_tier_platinum_commission" placeholder="25">
+              </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-success" onclick="saveConfig('referral')">
+                <i class="bi bi-check-lg me-1"></i>Simpan Referral Config
+              </button>
+              <button class="btn btn-outline-secondary" onclick="loadConfig('referral')">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Transfer -->
+      <div class="tab-content" id="transferTab" style="display:none;">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-send text-warning me-2"></i>Transfer Config
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Min Amount (RTP)</label>
+                <input type="number" class="form-control" id="transfer_minAmount">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Max Amount (RTP)</label>
+                <input type="number" class="form-control" id="transfer_maxAmount">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Daily Limit (RTP)</label>
+                <input type="number" class="form-control" id="transfer_dailyLimit">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Fee (%)</label>
+                <input type="number" step="0.1" class="form-control" id="transfer_feePercent">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Min Fee (RTP)</label>
+                <input type="number" class="form-control" id="transfer_feeMin">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Status</label>
+                <select class="form-select" id="transfer_enabled">
+                  <option value="true">Aktif</option>
+                  <option value="false">Nonaktif</option>
+                </select>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-success" onclick="saveConfig('transfer')">
+                <i class="bi bi-check-lg me-1"></i>Simpan Transfer Config
+              </button>
+              <button class="btn btn-outline-secondary" onclick="loadConfig('transfer')">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Spin -->
+      <div class="tab-content" id="spinTab" style="display:none;">
+        <div class="card stat-card">
+          <div class="card-body">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-suit-spade text-danger me-2"></i>Spin Wheel Config
+            </h6>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Cooldown (jam)</label>
+                <input type="number" class="form-control" id="spin_cooldownHours">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Status</label>
+                <select class="form-select" id="spin_enabled">
+                  <option value="true">Aktif</option>
+                  <option value="false">Nonaktif</option>
+                </select>
+              </div>
+
+              <div class="col-12"><hr class="my-2"></div>
+
+              <div class="col-12">
+                <h6 class="fw-bold small text-muted text-uppercase mb-2">Reward (Amount + Weight)</h6>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R1 — Amount</label>
+                <input type="number" class="form-control" id="spin_r1_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R1 — Weight</label>
+                <input type="number" class="form-control" id="spin_r1_weight">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R2 — Amount</label>
+                <input type="number" class="form-control" id="spin_r2_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R2 — Weight</label>
+                <input type="number" class="form-control" id="spin_r2_weight">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R3 — Amount</label>
+                <input type="number" class="form-control" id="spin_r3_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R3 — Weight</label>
+                <input type="number" class="form-control" id="spin_r3_weight">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R4 — Amount</label>
+                <input type="number" class="form-control" id="spin_r4_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R4 — Weight</label>
+                <input type="number" class="form-control" id="spin_r4_weight">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R5 — Amount</label>
+                <input type="number" class="form-control" id="spin_r5_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R5 — Weight</label>
+                <input type="number" class="form-control" id="spin_r5_weight">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R6 — Amount</label>
+                <input type="number" class="form-control" id="spin_r6_amount">
+              </div>
+              <div class="col-md-3">
+                <label class="form-label small fw-semibold">R6 — Weight</label>
+                <input type="number" class="form-control" id="spin_r6_weight">
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-success" onclick="saveConfig('spin')">
+                <i class="bi bi-check-lg me-1"></i>Simpan Spin Config
+              </button>
+              <button class="btn btn-outline-secondary" onclick="loadConfig('spin')">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div>
@@ -371,13 +667,240 @@
       document.querySelectorAll('#configTabs .nav-link').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       const t = btn.dataset.tab;
-      document.getElementById('dailyTab').style.display = t === 'daily' ? '' : 'none';
-      document.getElementById('adsTab').style.display = t === 'ads' ? '' : 'none';
-      document.getElementById('gameTab').style.display = t === 'game' ? '' : 'none';
-      const sysTab = document.getElementById('systemTab');
-      if (sysTab) sysTab.style.display = t === 'system' ? '' : 'none';
+      
+      // Generic: sembunyikan semua tab-content, tampilkan yang dipilih
+      document.querySelectorAll('.tab-content').forEach(el => {
+        el.style.display = 'none';
+      });
+      const target = document.getElementById(t + 'Tab');
+      if (target) target.style.display = '';
     });
   });
+
+  // ============================================================
+  // SHOP CARD RENDERER + MODAL
+  // ============================================================
+  let shopData = { tiers: {}, rtpPacks: {}, minerPacks: {}, bundles: {} };
+  let editingItem = null;
+
+  const TIER_META = {
+    STARTER: { icon: '🥉', name: 'Starter', c1: '#CD7F32', c2: '#8B5A2B' },
+    PREMIUM: { icon: '🥈', name: 'Premium', c1: '#C0C0C0', c2: '#808080' },
+    VIP:     { icon: '🥇', name: 'VIP',     c1: '#FFD700', c2: '#B8860B' },
+    ROYAL:   { icon: '💎', name: 'Royal',   c1: '#B9F2FF', c2: '#4A90D9' }
+  };
+
+  const RTP_META = {
+    rtp_pack_1000:  { icon: '💰', name: 'Starter Pack' },
+    rtp_pack_5000:  { icon: '💎', name: 'Popular Pack' },
+    rtp_pack_15000: { icon: '👑', name: 'Pro Pack' },
+    rtp_pack_50000: { icon: '🐋', name: 'Whale Pack' }
+  };
+
+  const MINER_META = {
+    miner_pack_starter: { icon: '⛏️', name: 'Starter Miner', desc: '3× Pico Miner' },
+    miner_pack_pro:     { icon: '🔧', name: 'Pro Miner',     desc: '2× Micro Rig + 3× Pico Miner' },
+    miner_pack_elite:   { icon: '⚡', name: 'Elite Miner',   desc: '1× Quantum Rig + 2× Micro Rig + 3× Pico Miner' },
+    miner_pack_legend:  { icon: '💎', name: 'Legend Miner',  desc: '1× Titan Miner + 2× Quantum Rig + 3× Micro Rig' }
+  };
+
+  const BUNDLE_META = {
+    bundle_starter: { icon: '🎁', name: 'Starter Bundle', desc: '5.000 RTP + 3× Pico Miner' },
+    bundle_pro:     { icon: '🎁', name: 'Pro Bundle',     desc: '15.000 RTP + 2× Micro Rig + 3× Pico Miner' },
+    bundle_elite:   { icon: '🎁', name: 'Elite Bundle',   desc: '50.000 RTP + 1× Quantum Rig + 2× Micro Rig + 3× Pico Miner' }
+  };
+
+  function renderTiers() {
+    const grid = document.getElementById('shop-tier-grid');
+    if (!grid) return;
+    grid.innerHTML = Object.entries(TIER_META).map(([tier, meta]) => {
+      const d = (shopData.tiers && shopData.tiers[tier]) || {};
+      return `
+        <div class="col-md-3">
+          <div class="tier-card" style="--tc1: ${meta.c1}; --tc2: ${meta.c2};">
+            <div class="tier-card-header">
+              <span class="tier-card-icon">${meta.icon}</span>
+              <span class="tier-card-name">${tier}</span>
+            </div>
+            <div class="tier-card-price">$${(d.priceUsd || 0).toFixed(2)}</div>
+            <div class="tier-card-stats">
+              <div class="tier-card-stat">
+                <span class="tier-card-stat-label">Slot</span>
+                <span class="tier-card-stat-value">${d.maxMinerSlots || 0}</span>
+              </div>
+              <div class="tier-card-stat">
+                <span class="tier-card-stat-label">Komisi</span>
+                <span class="tier-card-stat-value">${((d.affiliateRate || 0) * 100).toFixed(0)}%</span>
+              </div>
+            </div>
+            <button class="tier-card-btn" onclick="openShopModal('tier', '${tier}')">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderPacks() {
+    const rtpGrid = document.getElementById('shop-rtp-grid');
+    if (rtpGrid) {
+      rtpGrid.innerHTML = Object.entries(RTP_META).map(([id, meta]) => {
+        const d = (shopData.rtpPacks && shopData.rtpPacks[id]) || {};
+        return `
+          <div class="pack-card">
+            <span class="pack-card-icon">${meta.icon}</span>
+            <div class="pack-card-info">
+              <div class="pack-card-name">${meta.name}</div>
+              <div class="pack-card-desc">${(d.rtp || 0).toLocaleString()} RTP</div>
+            </div>
+            <div class="pack-card-price">$${(d.priceUsd || 0).toFixed(2)}</div>
+            <button class="pack-card-edit" onclick="openShopModal('rtp', '${id}')">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const minerGrid = document.getElementById('shop-miner-grid');
+    if (minerGrid) {
+      minerGrid.innerHTML = Object.entries(MINER_META).map(([id, meta]) => {
+        const d = (shopData.minerPacks && shopData.minerPacks[id]) || {};
+        return `
+          <div class="pack-card">
+            <span class="pack-card-icon">${meta.icon}</span>
+            <div class="pack-card-info">
+              <div class="pack-card-name">${meta.name}</div>
+              <div class="pack-card-desc">${meta.desc}</div>
+            </div>
+            <div class="pack-card-price">$${(d.priceUsd || 0).toFixed(2)}</div>
+            <button class="pack-card-edit" onclick="openShopModal('miner', '${id}')">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const bundleGrid = document.getElementById('shop-bundle-grid');
+    if (bundleGrid) {
+      bundleGrid.innerHTML = Object.entries(BUNDLE_META).map(([id, meta]) => {
+        const d = (shopData.bundles && shopData.bundles[id]) || {};
+        return `
+          <div class="pack-card">
+            <span class="pack-card-icon">${meta.icon}</span>
+            <div class="pack-card-info">
+              <div class="pack-card-name">${meta.name}</div>
+              <div class="pack-card-desc">${meta.desc}</div>
+            </div>
+            <div class="pack-card-price">$${(d.priceUsd || 0).toFixed(2)}</div>
+            <button class="pack-card-edit" onclick="openShopModal('bundle', '${id}')">
+              <i class="bi bi-pencil"></i> Edit
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  window.renderShop = () => { renderTiers(); renderPacks(); };
+
+  window.openShopModal = (type, id) => {
+    editingItem = { type, id };
+    const modal = document.getElementById('shopModal');
+    const title = document.getElementById('shopModalTitle');
+    const body = document.getElementById('shopModalBody');
+    let fields = '', titleText = '';
+
+    if (type === 'tier') {
+      const meta = TIER_META[id];
+      const d = (shopData.tiers && shopData.tiers[id]) || {};
+      titleText = meta.icon + ' Edit ' + meta.name;
+      fields = `
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Harga (USD)</label>
+          <input type="number" step="0.01" class="shop-modal-input" id="modal_priceUsd" value="${d.priceUsd || 0}">
+        </div>
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Slot Miner</label>
+          <input type="number" class="shop-modal-input" id="modal_maxMinerSlots" value="${d.maxMinerSlots || 0}">
+        </div>
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Komisi (0.00 - 1.00)</label>
+          <input type="number" step="0.01" class="shop-modal-input" id="modal_affiliateRate" value="${d.affiliateRate || 0}">
+        </div>
+      `;
+    } else if (type === 'rtp') {
+      const meta = RTP_META[id];
+      const d = (shopData.rtpPacks && shopData.rtpPacks[id]) || {};
+      titleText = meta.icon + ' Edit ' + meta.name;
+      fields = `
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Harga (USD)</label>
+          <input type="number" step="0.01" class="shop-modal-input" id="modal_priceUsd" value="${d.priceUsd || 0}">
+        </div>
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Jumlah RTP</label>
+          <input type="number" class="shop-modal-input" id="modal_rtp" value="${d.rtp || 0}">
+        </div>
+      `;
+    } else if (type === 'miner' || type === 'bundle') {
+      const meta = type === 'miner' ? MINER_META[id] : BUNDLE_META[id];
+      const data = type === 'miner' ? (shopData.minerPacks && shopData.minerPacks[id]) : (shopData.bundles && shopData.bundles[id]);
+      const d = data || {};
+      titleText = meta.icon + ' Edit ' + meta.name;
+      fields = `
+        <div class="shop-modal-field">
+          <label class="shop-modal-label">Harga (USD)</label>
+          <input type="number" step="0.01" class="shop-modal-input" id="modal_priceUsd" value="${d.priceUsd || 0}">
+        </div>
+      `;
+    }
+
+    title.textContent = titleText;
+    body.innerHTML = fields;
+    modal.classList.add('active');
+  };
+
+  window.closeShopModal = () => {
+    document.getElementById('shopModal').classList.remove('active');
+    editingItem = null;
+  };
+
+  window.applyShopModal = () => {
+    if (!editingItem) return;
+    const { type, id } = editingItem;
+
+    if (type === 'tier') {
+      if (!shopData.tiers) shopData.tiers = {};
+      shopData.tiers[id] = {
+        priceUsd: parseFloat(document.getElementById('modal_priceUsd').value) || 0,
+        maxMinerSlots: parseInt(document.getElementById('modal_maxMinerSlots').value) || 0,
+        affiliateRate: parseFloat(document.getElementById('modal_affiliateRate').value) || 0
+      };
+    } else if (type === 'rtp') {
+      if (!shopData.rtpPacks) shopData.rtpPacks = {};
+      shopData.rtpPacks[id] = {
+        priceUsd: parseFloat(document.getElementById('modal_priceUsd').value) || 0,
+        rtp: parseInt(document.getElementById('modal_rtp').value) || 0
+      };
+    } else if (type === 'miner') {
+      if (!shopData.minerPacks) shopData.minerPacks = {};
+      shopData.minerPacks[id] = Object.assign({}, shopData.minerPacks[id], {
+        priceUsd: parseFloat(document.getElementById('modal_priceUsd').value) || 0
+      });
+    } else if (type === 'bundle') {
+      if (!shopData.bundles) shopData.bundles = {};
+      shopData.bundles[id] = Object.assign({}, shopData.bundles[id], {
+        priceUsd: parseFloat(document.getElementById('modal_priceUsd').value) || 0
+      });
+    }
+
+    closeShopModal();
+    renderShop();
+    showAlert('Perubahan disimpan (klik Simpan Shop Config untuk apply)', 'info');
+  };
 
   window.loadConfig = async (type) => {
     const res = await AdminAPI.getConfig(type);
@@ -412,6 +935,40 @@
         if (el) el.value = d[k] ?? '';
       });
       updateCooldownHints();
+    } else if (type === 'shop') {
+      // Simpan data ke state + render cards
+      shopData = {
+        tiers: d.tiers || {},
+        rtpPacks: d.rtpPacks || {},
+        minerPacks: d.minerPacks || {},
+        bundles: d.bundles || {}
+      };
+      renderShop();
+    } else if (type === 'referral') {
+      document.getElementById('referral_syaratTier').value = d.syaratTier || 'PREMIUM';
+      document.getElementById('referral_syaratOrder').value = d.syaratOrder ?? 3;
+      const tiers = d.tiers || [];
+      tiers.forEach(t => {
+        const el = document.getElementById(`referral_tier_${t.id}_commission`);
+        if (el) el.value = t.commission ?? '';
+      });
+    } else if (type === 'transfer') {
+      document.getElementById('transfer_minAmount').value = d.minAmount ?? '';
+      document.getElementById('transfer_maxAmount').value = d.maxAmount ?? '';
+      document.getElementById('transfer_dailyLimit').value = d.dailyLimit ?? '';
+      document.getElementById('transfer_feePercent').value = d.feePercent ?? '';
+      document.getElementById('transfer_feeMin').value = d.feeMin ?? '';
+      document.getElementById('transfer_enabled').value = String(d.enabled ?? true);
+    } else if (type === 'spin') {
+      document.getElementById('spin_cooldownHours').value = d.cooldownHours ?? 24;
+      document.getElementById('spin_enabled').value = String(d.enabled ?? true);
+      const rewards = d.rewards || [];
+      rewards.forEach((r, i) => {
+        const a = document.getElementById(`spin_r${i+1}_amount`);
+        const w = document.getElementById(`spin_r${i+1}_weight`);
+        if (a) a.value = r.amount ?? '';
+        if (w) w.value = r.weight ?? '';
+      });
     }
   };
 
@@ -451,6 +1008,44 @@
         const el = document.getElementById('game_' + k);
         if (el) body[k] = parseFloat(el.value) || 0;
       });
+    } else if (type === 'shop') {
+      // Pakai state shopData (bukan form field)
+      body = {
+        tiers: shopData.tiers || {},
+        rtpPacks: shopData.rtpPacks || {},
+        minerPacks: shopData.minerPacks || {},
+        bundles: shopData.bundles || {}
+      };
+    } else if (type === 'referral') {
+      body = {
+        syaratTier: document.getElementById('referral_syaratTier').value,
+        syaratOrder: parseInt(document.getElementById('referral_syaratOrder').value) || 3,
+        tiers: [
+          { id: 'starter',  commission: parseInt(document.getElementById('referral_tier_starter_commission')?.value) || 0 },
+          { id: 'bronze',   commission: parseInt(document.getElementById('referral_tier_bronze_commission')?.value) || 10 },
+          { id: 'silver',   commission: parseInt(document.getElementById('referral_tier_silver_commission')?.value) || 15 },
+          { id: 'gold',     commission: parseInt(document.getElementById('referral_tier_gold_commission')?.value) || 20 },
+          { id: 'platinum', commission: parseInt(document.getElementById('referral_tier_platinum_commission')?.value) || 25 }
+        ]
+      };
+    } else if (type === 'transfer') {
+      body = {
+        minAmount: parseInt(document.getElementById('transfer_minAmount').value) || 0,
+        maxAmount: parseInt(document.getElementById('transfer_maxAmount').value) || 0,
+        dailyLimit: parseInt(document.getElementById('transfer_dailyLimit').value) || 0,
+        feePercent: parseFloat(document.getElementById('transfer_feePercent').value) || 0,
+        feeMin: parseInt(document.getElementById('transfer_feeMin').value) || 0,
+        enabled: document.getElementById('transfer_enabled').value === 'true'
+      };
+    } else if (type === 'spin') {
+      body = {
+        cooldownHours: parseInt(document.getElementById('spin_cooldownHours').value) || 24,
+        enabled: document.getElementById('spin_enabled').value === 'true',
+        rewards: [1,2,3,4,5,6].map(i => ({
+          amount: parseInt(document.getElementById(`spin_r${i}_amount`)?.value) || 0,
+          weight: parseInt(document.getElementById(`spin_r${i}_weight`)?.value) || 0
+        })).filter(r => r.amount > 0)
+      };
     }
 
     if (!confirm(`Simpan ${type} config?`)) return;
@@ -465,6 +1060,7 @@
 
   document.getElementById('reloadBtn').onclick = () => {
     loadConfig('daily'); loadConfig('ads'); loadConfig('game');
+    loadConfig('shop'); loadConfig('referral'); loadConfig('transfer'); loadConfig('spin');
     AdminAPI.toast('Config dimuat ulang', 'success');
   };
 
@@ -507,7 +1103,10 @@
     }
   };
 
-  await Promise.all([loadConfig('daily'), loadConfig('ads'), loadConfig('game')]);
+  await Promise.all([
+    loadConfig('daily'), loadConfig('ads'), loadConfig('game'),
+    loadConfig('shop'), loadConfig('referral'), loadConfig('transfer'), loadConfig('spin')
+  ]);
   loadMaintenance();
 })();
 </script>
