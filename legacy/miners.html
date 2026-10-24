@@ -255,6 +255,36 @@
             return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         }
 
+        // === AUTO-GENERATE ID ===
+        function slugify(text) {
+            return String(text || '')
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '_')
+                .replace(/^_+|_+$/g, '')
+                .replace(/_+/g, '_');
+        }
+
+        function generateMinerId(name) {
+            const slug = slugify(name);
+            if (!slug) return '';
+            return 'miner_' + slug;
+        }
+
+        function makeUniqueMinerId(baseId, currentIndex = -1) {
+            if (!baseId) return '';
+            let id = baseId;
+            let counter = 2;
+            const exists = (checkId) => {
+                return minersData.some((m, i) => m.id === checkId && i !== currentIndex);
+            };
+            while (exists(id)) {
+                id = baseId + '_' + counter;
+                counter++;
+            }
+            return id;
+        }
+
         // === HASH RATE HELPERS ===
         const HASH_UNITS = [
             { code: 'Hs',  label: 'H/s',  factor: 1e-9 },    // 1 H/s = 1e-9 GH/s
@@ -362,6 +392,17 @@
             document.getElementById('saveBar').style.display = dirty ? 'flex' : 'none';
         }
 
+        // === AUTO-FILL ID ===
+        window.autoFillMinerId = function(name) {
+            const idInput = document.getElementById('m_id');
+            const preview = document.getElementById('modalIdPreview');
+            if (!idInput) return;
+            const generated = generateMinerId(name);
+            const unique = makeUniqueMinerId(generated);
+            idInput.value = unique;
+            if (preview) preview.textContent = unique || 'ID baru';
+        };
+
         function openMinerModal(miner = null) {
             const isEdit = !!miner;
             const m = miner || {
@@ -392,10 +433,16 @@
 
                             <div class="miner-field-row">
                                 <div class="miner-field">
-                                    <label class="miner-field-label">ID (unik)</label>
+                                    <label class="miner-field-label">
+                                        ID (unik)
+                                        <span style="color:#22D3EE;font-size:10px;font-weight:600;margin-left:6px;">
+                                            ${isEdit ? '(tidak bisa diubah)' : '✨ Auto dari nama'}
+                                        </span>
+                                    </label>
                                     <input class="miner-field-input" id="m_id" value="${escapeHtml(m.id)}"
-                                        ${isEdit ? 'readonly style="opacity:0.6;"' : ''}
-                                        placeholder="miner_diamond" oninput="document.getElementById('modalIdPreview').textContent=this.value||'ID baru'">
+                                        ${isEdit ? 'readonly' : 'readonly'}
+                                        style="font-family:monospace;${isEdit ? 'opacity:0.6;' : 'opacity:0.85;'}"
+                                        placeholder="otomatis dari nama">
                                 </div>
                                 <div class="miner-field">
                                     <label class="miner-field-label">Icon (emoji)</label>
@@ -405,7 +452,9 @@
 
                             <div class="miner-field">
                                 <label class="miner-field-label">Nama</label>
-                                <input class="miner-field-input" id="m_name" value="${escapeHtml(m.name)}" placeholder="Pico Miner">
+                                <input class="miner-field-input" id="m_name" value="${escapeHtml(m.name)}"
+                                    placeholder="Pico Miner"
+                                    oninput="if(!${isEdit}) autoFillMinerId(this.value)">
                             </div>
 
                             <div class="miner-field">
@@ -517,6 +566,10 @@
             };
 
             if (!body.id || !body.name) { showToast('ID & Nama wajib', 'warning'); return; }
+            if (!body.id.startsWith('miner_')) { showToast('ID harus dimulai "miner_"', 'warning'); return; }
+            if (isEdit === false && minersData.some(m => m.id === body.id)) {
+                showToast('ID sudah dipakai miner lain!', 'error'); return;
+            }
 
             if (isEdit) {
                 minersData[index] = { ...minersData[index], ...body };
