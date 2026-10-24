@@ -27,7 +27,8 @@
                 { href: 'campaigns.html',   icon: 'megaphone',         label: 'Campaigns' },
                 { href: 'achievements.html',icon: 'trophy',            label: 'Achievements', badge: 'NEW' },
                 { href: 'mining.html',      icon: 'pickaxe',           label: 'Mining' },
-                { href: 'thermal.html',     icon: 'thermometer-half',  label: 'Thermal' }
+                { href: 'thermal.html',     icon: 'thermometer-half',  label: 'Thermal' },
+                { href: 'miners.html',      icon: 'cpu',               label: 'Miners', badge: 'NEW' }
             ]
         },
         {

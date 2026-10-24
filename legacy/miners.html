@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Miners — Royaltree Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="assets/css/admin.css" rel="stylesheet">
+    <script>(function(){if(!localStorage.getItem('royaltree_admin_token'))window.location.replace('login.html');})();</script>
+    <style>
+        /* === MINER PAGE — DARK THEME, KONTRAS TINGGI === */
+        .miner-header {
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 16px; margin-bottom: 24px;
+        }
+        .miner-title { font-size: 24px; font-weight: 800; color: #F8FAFC; margin: 0; }
+        .miner-subtitle { font-size: 13px; color: #94A3B8; margin-top: 4px; }
+
+        .miner-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 16px;
+        }
+
+        .miner-card {
+            background: #1E293B;
+            border: 2px solid #334155;
+            border-radius: 14px;
+            padding: 0;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .miner-card:hover {
+            border-color: #8B5CF6;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.25);
+            transform: translateY(-2px);
+        }
+
+        /* Tier border kiri — warna tegas */
+        .miner-card.tier-COMMON    { border-left: 5px solid #64748B; }
+        .miner-card.tier-RARE      { border-left: 5px solid #3B82F6; }
+        .miner-card.tier-EPIC      { border-left: 5px solid #A855F7; }
+        .miner-card.tier-LEGENDARY { border-left: 5px solid #F59E0B; }
+        .miner-card.tier-MYTHIC    { border-left: 5px solid #06B6D4; }
+
+        .miner-card-header {
+            display: flex; align-items: start; justify-content: space-between;
+            padding: 16px 16px 0 16px; gap: 12px;
+        }
+        .miner-card-icon {
+            font-size: 36px; line-height: 1;
+            width: 56px; height: 56px;
+            display: flex; align-items: center; justify-content: center;
+            background: #0F172A;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            flex-shrink: 0;
+        }
+        .miner-card-title { flex: 1; min-width: 0; }
+        .miner-card-name { font-size: 16px; font-weight: 800; color: #F8FAFC; margin: 0 0 4px 0; }
+        .miner-card-desc { font-size: 11px; color: #94A3B8; line-height: 1.3; }
+
+        .miner-tier-badge {
+            display: inline-block; padding: 3px 10px; border-radius: 6px;
+            font-size: 10px; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;
+            color: #0F172A;
+        }
+        .tier-badge-COMMON    { background: #64748B; color: #F8FAFC; }
+        .tier-badge-RARE      { background: #3B82F6; color: #F8FAFC; }
+        .tier-badge-EPIC      { background: #A855F7; color: #F8FAFC; }
+        .tier-badge-LEGENDARY { background: #F59E0B; color: #0F172A; }
+        .tier-badge-MYTHIC    { background: #06B6D4; color: #0F172A; }
+
+        .miner-card-actions {
+            display: flex; gap: 4px; flex-shrink: 0;
+        }
+        .miner-action-btn {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            background: #0F172A; border: 1px solid #334155;
+            border-radius: 8px; color: #CBD5E1; cursor: pointer;
+            transition: all 0.15s;
+        }
+        .miner-action-btn:hover { background: #1E40AF; color: #F8FAFC; border-color: #3B82F6; }
+        .miner-action-btn.danger:hover { background: #991B1B; color: #F8FAFC; border-color: #EF4444; }
+
+        .miner-stats {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 1px; background: #334155;
+            margin-top: 16px; border-top: 1px solid #334155;
+        }
+        .miner-stat {
+            background: #0F172A; padding: 12px 10px; text-align: center;
+        }
+        .miner-stat-label {
+            font-size: 9px; font-weight: 700; color: #64748B;
+            text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+        }
+        .miner-stat-value { font-size: 14px; font-weight: 800; }
+        .stat-token { color: #FBBF24; }
+        .stat-power { color: #22D3EE; }
+        .stat-rtp   { color: #34D399; }
+
+        .miner-footer {
+            padding: 10px 16px; background: #0B1220;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 10px; color: #64748B;
+        }
+        .miner-footer strong { color: #94A3B8; }
+
+        /* === MODAL — INPUT HASHRATE FRIENDLY === */
+        .hashrate-input-group {
+            display: flex; gap: 8px; align-items: stretch;
+        }
+        .hashrate-input-group input {
+            flex: 1; font-size: 16px; font-weight: 700;
+            padding: 12px 14px; text-align: right;
+            background: #0F172A; border: 2px solid #334155;
+            border-radius: 10px; color: #22D3EE;
+        }
+        .hashrate-input-group input:focus {
+            outline: none; border-color: #22D3EE;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15);
+        }
+        .hashrate-unit-select {
+            width: 110px; padding: 12px 10px;
+            font-size: 14px; font-weight: 700;
+            background: #1E293B; border: 2px solid #334155;
+            border-radius: 10px; color: #F8FAFC;
+            cursor: pointer;
+        }
+        .hashrate-unit-select:focus { outline: none; border-color: #22D3EE; }
+
+        .hashrate-preview {
+            margin-top: 8px; padding: 10px 12px;
+            background: rgba(34, 211, 238, 0.08);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            border-radius: 8px;
+            font-size: 12px; color: #94A3B8;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .hashrate-preview strong { color: #22D3EE; font-size: 14px; }
+
+        /* Modal umum */
+        .miner-modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(2, 6, 23, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 3000;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .miner-modal {
+            background: #1E293B;
+            border: 2px solid #475569;
+            border-radius: 16px;
+            max-width: 560px; width: 100%;
+            max-height: 92vh; overflow-y: auto;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);
+        }
+        .miner-modal-header {
+            padding: 20px 24px;
+            border-bottom: 2px solid #334155;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .miner-modal-title { font-size: 18px; font-weight: 800; color: #F8FAFC; margin: 0; }
+        .miner-modal-id { font-size: 12px; color: #22D3EE; font-family: monospace; margin-top: 2px; }
+        .miner-modal-body { padding: 20px 24px; }
+        .miner-modal-footer {
+            padding: 16px 24px; border-top: 2px solid #334155;
+            display: flex; gap: 10px; justify-content: flex-end;
+            background: #0F172A;
+        }
+
+        .miner-field { margin-bottom: 16px; }
+        .miner-field-label {
+            display: block; font-size: 11px; font-weight: 700;
+            color: #CBD5E1; text-transform: uppercase;
+            letter-spacing: 0.5px; margin-bottom: 6px;
+        }
+        .miner-field-input {
+            width: 100%; padding: 10px 12px;
+            background: #0F172A; border: 2px solid #334155;
+            border-radius: 8px; color: #F8FAFC; font-size: 14px;
+        }
+        .miner-field-input:focus {
+            outline: none; border-color: #8B5CF6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+        .miner-field-row {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+
+        /* Save bar */
+        .miner-save-bar {
+            position: sticky; bottom: 0;
+            background: #1E293B; border-top: 2px solid #8B5CF6;
+            padding: 14px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-top: 20px; border-radius: 12px;
+            box-shadow: 0 -8px 24px rgba(139, 92, 246, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-layout">
+        <aside id="admin-sidebar"></aside>
+        <div class="admin-main">
+            <header id="admin-topbar"></header>
+            <main class="admin-content">
+                <div class="miner-header">
+                    <div>
+                        <h1 class="miner-title">⛏️ Miner Catalog</h1>
+                        <div class="miner-subtitle" id="minerCount">Memuat...</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="openMinerModal()" style="padding:10px 20px;font-weight:700;">
+                        <i class="bi bi-plus-lg"></i> Tambah Miner
+                    </button>
+                </div>
+
+                <div class="miner-grid" id="minerGrid">
+                    <div style="grid-column:1/-1;padding:60px;text-align:center;color:#94A3B8;">
+                        <i class="bi bi-hourglass-split" style="font-size:40px;"></i>
+                        <div style="margin-top:12px;">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="miner-save-bar" id="saveBar" style="display:none;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <i class="bi bi-exclamation-circle-fill" style="color:#FBBF24;font-size:20px;"></i>
+                        <span style="color:#F8FAFC;font-weight:600;">Perubahan belum disimpan</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveAllMiners()" style="padding:10px 24px;font-weight:700;">
+                        <i class="bi bi-check-lg"></i> Simpan Semua
+                    </button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/api.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/layout.js"></script>
+    <script>
+        AdminLayout.init('Miners');
+
+        let minersData = [];
+        let dirty = false;
+
+        function escapeHtml(s) {
+            if (s == null) return '';
+            return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+        }
+
+        // === HASH RATE HELPERS ===
+        const HASH_UNITS = [
+            { code: 'Hs',  label: 'H/s',  factor: 1e-9 },    // 1 H/s = 1e-9 GH/s
+            { code: 'KHs', label: 'KH/s', factor: 1e-6 },    // 1 KH/s = 1e-6 GH/s
+            { code: 'MHs', label: 'MH/s', factor: 1e-3 },    // 1 MH/s = 1e-3 GH/s
+            { code: 'GHs', label: 'GH/s', factor: 1 }        // 1 GH/s = 1 GH/s
+        ];
+
+        function autoPickUnit(ghs) {
+            const n = Number(ghs) || 0;
+            if (n >= 1) return { value: n, unit: 'GHs', label: 'GH/s' };
+            if (n >= 1e-3) return { value: n * 1000, unit: 'MHs', label: 'MH/s' };
+            if (n >= 1e-6) return { value: n * 1e6, unit: 'KHs', label: 'KH/s' };
+            return { value: n * 1e9, unit: 'Hs', label: 'H/s' };
+        }
+
+        function toGhs(value, unitCode) {
+            const u = HASH_UNITS.find(x => x.code === unitCode);
+            if (!u) return Number(value) || 0;
+            return (Number(value) || 0) * u.factor;
+        }
+
+        function fmtHashrate(ghs) {
+            const d = autoPickUnit(ghs);
+            const v = d.value;
+            if (v >= 1000) return v.toFixed(0) + ' ' + d.label;
+            if (v >= 100) return v.toFixed(1).replace(/\.0$/, '') + ' ' + d.label;
+            if (v >= 1) return v.toFixed(2).replace(/\.?0+$/, '') + ' ' + d.label;
+            return v.toFixed(4).replace(/\.?0+$/, '') + ' ' + d.label;
+        }
+
+        function tierBadgeClass(tier) {
+            return 'tier-badge-' + (tier || 'COMMON');
+        }
+
+        function tierClass(tier) {
+            return 'tier-' + (tier || 'COMMON');
+        }
+
+        async function loadMiners() {
+            try {
+                const res = await AdminAPI.request('/miner-catalog');
+                if (res.success && res.data && res.data.miners) {
+                    minersData = res.data.miners;
+                    renderMiners();
+                } else {
+                    document.getElementById('minerGrid').innerHTML = '<div style="grid-column:1/-1;padding:40px;text-align:center;color:#EF4444;">Gagal load miner</div>';
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        function renderMiners() {
+            document.getElementById('minerCount').textContent =
+                `${minersData.length} miner terdaftar · Klik ✏️ untuk edit`;
+
+            const grid = document.getElementById('minerGrid');
+            if (minersData.length === 0) {
+                grid.innerHTML = '<div style="grid-column:1/-1;padding:60px;text-align:center;color:#94A3B8;"><i class="bi bi-inbox" style="font-size:48px;opacity:0.5;"></i><div style="margin-top:12px;">Belum ada miner</div></div>';
+                return;
+            }
+
+            grid.innerHTML = minersData.map((m, i) => `
+                <div class="miner-card ${tierClass(m.tier)}">
+                    <div class="miner-card-header">
+                        <div class="miner-card-icon">${m.iconEmoji || '⛏️'}</div>
+                        <div class="miner-card-title">
+                            <div class="miner-card-name">${escapeHtml(m.name || '-')}</div>
+                            <div class="miner-card-desc">${escapeHtml(m.description || 'Tanpa deskripsi')}</div>
+                        </div>
+                        <div class="miner-card-actions">
+                            <button class="miner-action-btn" onclick="editMiner(${i})" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="miner-action-btn danger" onclick="deleteMiner(${i})" title="Hapus">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px 16px 0;">
+                        <span class="miner-tier-badge ${tierBadgeClass(m.tier)}">${escapeHtml(m.tier || 'COMMON')}</span>
+                    </div>
+                    <div class="miner-stats">
+                        <div class="miner-stat">
+                            <div class="miner-stat-label">Token</div>
+                            <div class="miner-stat-value stat-token">${(m.tokenCost || 0).toLocaleString('id-ID')}</div>
+                        </div>
+                        <div class="miner-stat">
+                            <div class="miner-stat-label">Hashrate</div>
+                            <div class="miner-stat-value stat-power">${fmtHashrate(m.powerGhs)}</div>
+                        </div>
+                        <div class="miner-stat">
+                            <div class="miner-stat-label">RTP/menit</div>
+                            <div class="miner-stat-value stat-rtp">${m.pointsPerMinute || 0}</div>
+                        </div>
+                    </div>
+                    <div class="miner-footer">
+                        <span><strong>${(m.pointsPerDay || 0).toFixed(2)}</strong> RTP/hari</span>
+                        <span>+${(m.bonusPermanentPct || 0).toFixed(2)}% bonus</span>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('saveBar').style.display = dirty ? 'flex' : 'none';
+        }
+
+        function openMinerModal(miner = null) {
+            const isEdit = !!miner;
+            const m = miner || {
+                id: '', name: '', tier: 'COMMON', iconEmoji: '⛏️', tokenCost: 10,
+                powerGhs: 0.000001, pointsPerMinute: 0.0001, pointsPerDay: 0.144,
+                bonusPermanentPct: 0, description: ''
+            };
+
+            const display = autoPickUnit(m.powerGhs);
+
+            const unitOptions = HASH_UNITS.map(u =>
+                `<option value="${u.code}" ${u.code === display.unit ? 'selected' : ''}>${u.label}</option>`
+            ).join('');
+
+            const html = `
+                <div class="miner-modal-overlay" id="minerModal">
+                    <div class="miner-modal">
+                        <div class="miner-modal-header">
+                            <div>
+                                <h2 class="miner-modal-title">${isEdit ? '✏️ Edit Miner' : '➕ Tambah Miner'}</h2>
+                                <div class="miner-modal-id" id="modalIdPreview">${isEdit ? escapeHtml(m.id) : 'ID baru'}</div>
+                            </div>
+                            <button class="miner-action-btn" onclick="closeMinerModal()" style="width:36px;height:36px;">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div class="miner-modal-body">
+
+                            <div class="miner-field-row">
+                                <div class="miner-field">
+                                    <label class="miner-field-label">ID (unik)</label>
+                                    <input class="miner-field-input" id="m_id" value="${escapeHtml(m.id)}"
+                                        ${isEdit ? 'readonly style="opacity:0.6;"' : ''}
+                                        placeholder="miner_diamond" oninput="document.getElementById('modalIdPreview').textContent=this.value||'ID baru'">
+                                </div>
+                                <div class="miner-field">
+                                    <label class="miner-field-label">Icon (emoji)</label>
+                                    <input class="miner-field-input" id="m_icon" value="${escapeHtml(m.iconEmoji || '⛏️')}" style="text-align:center;font-size:24px;" maxlength="4">
+                                </div>
+                            </div>
+
+                            <div class="miner-field">
+                                <label class="miner-field-label">Nama</label>
+                                <input class="miner-field-input" id="m_name" value="${escapeHtml(m.name)}" placeholder="Pico Miner">
+                            </div>
+
+                            <div class="miner-field">
+                                <label class="miner-field-label">Deskripsi</label>
+                                <input class="miner-field-input" id="m_desc" value="${escapeHtml(m.description || '')}" placeholder="Miner dasar untuk pemula">
+                            </div>
+
+                            <div class="miner-field-row">
+                                <div class="miner-field">
+                                    <label class="miner-field-label">Tier</label>
+                                    <select class="miner-field-input" id="m_tier">
+                                        ${['COMMON','RARE','EPIC','LEGENDARY','MYTHIC'].map(t => `<option value="${t}" ${m.tier === t ? 'selected' : ''}>${t}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="miner-field">
+                                    <label class="miner-field-label">Token Cost</label>
+                                    <input type="number" class="miner-field-input" id="m_tokenCost" value="${m.tokenCost || 0}">
+                                </div>
+                            </div>
+
+                            <div class="miner-field" style="margin-top:20px;padding-top:16px;border-top:2px dashed #334155;">
+                                <label class="miner-field-label">⚡ Power / Hashrate</label>
+                                <div class="hashrate-input-group">
+                                    <input type="number" step="any" id="m_powerValue" value="${display.value}" placeholder="1">
+                                    <select class="hashrate-unit-select" id="m_powerUnit">
+                                        ${unitOptions}
+                                    </select>
+                                </div>
+                                <div class="hashrate-preview">
+                                    <span>= <strong id="m_powerGhs">${m.powerGhs}</strong> GH/s</span>
+                                    <span style="font-size:10px;">${fmtHashrate(m.powerGhs)}</span>
+                                </div>
+                            </div>
+
+                            <div class="miner-field-row">
+                                <div class="miner-field">
+                                    <label class="miner-field-label">💵 RTP per Menit</label>
+                                    <input type="number" step="any" class="miner-field-input" id="m_ppm" value="${m.pointsPerMinute || 0}">
+                                </div>
+                                <div class="miner-field">
+                                    <label class="miner-field-label">📊 RTP per Hari (auto)</label>
+                                    <input type="number" class="miner-field-input" id="m_ppd" value="${m.pointsPerDay || 0}" readonly style="opacity:0.7;">
+                                </div>
+                            </div>
+
+                            <div class="miner-field">
+                                <label class="miner-field-label">🎁 Bonus Permanent (%)</label>
+                                <input type="number" step="any" class="miner-field-input" id="m_bonus" value="${m.bonusPermanentPct || 0}">
+                            </div>
+
+                        </div>
+                        <div class="miner-modal-footer">
+                            <button class="btn btn-outline" onclick="closeMinerModal()" style="padding:10px 20px;">Batal</button>
+                            <button class="btn btn-primary" onclick="saveMiner(${isEdit ? 'true' : 'false'}, ${isEdit ? minersData.indexOf(miner) : '-1'})" style="padding:10px 24px;font-weight:700;">
+                                <i class="bi bi-check-lg"></i> Simpan
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', html);
+
+            // Live update hashrate conversion
+            setTimeout(() => {
+                const valInput = document.getElementById('m_powerValue');
+                const unitSelect = document.getElementById('m_powerUnit');
+                const ghsLabel = document.getElementById('m_powerGhs');
+
+                function updateGhs() {
+                    const v = parseFloat(valInput.value) || 0;
+                    const u = unitSelect.value;
+                    const ghs = toGhs(v, u);
+                    ghsLabel.textContent = ghs;
+                }
+                valInput.addEventListener('input', updateGhs);
+                unitSelect.addEventListener('change', updateGhs);
+
+                // Auto ppm → ppd
+                const ppm = document.getElementById('m_ppm');
+                const ppd = document.getElementById('m_ppd');
+                ppm.addEventListener('input', () => {
+                    const v = parseFloat(ppm.value) || 0;
+                    ppd.value = (v * 60 * 24).toFixed(3);
+                });
+            }, 60);
+        }
+
+        function closeMinerModal() {
+            const el = document.getElementById('minerModal');
+            if (el) el.remove();
+        }
+
+        function saveMiner(isEdit, index) {
+            const powerValue = parseFloat(document.getElementById('m_powerValue').value) || 0;
+            const powerUnit = document.getElementById('m_powerUnit').value;
+            const powerGhs = toGhs(powerValue, powerUnit);
+
+            const body = {
+                id: document.getElementById('m_id').value.trim(),
+                name: document.getElementById('m_name').value.trim(),
+                description: document.getElementById('m_desc').value.trim(),
+                tier: document.getElementById('m_tier').value,
+                iconEmoji: document.getElementById('m_icon').value.trim(),
+                tokenCost: parseInt(document.getElementById('m_tokenCost').value) || 0,
+                powerGhs: powerGhs,
+                pointsPerMinute: parseFloat(document.getElementById('m_ppm').value) || 0,
+                pointsPerDay: (parseFloat(document.getElementById('m_ppm').value) || 0) * 60 * 24,
+                bonusPermanentPct: parseFloat(document.getElementById('m_bonus').value) || 0
+            };
+
+            if (!body.id || !body.name) { showToast('ID & Nama wajib', 'warning'); return; }
+
+            if (isEdit) {
+                minersData[index] = { ...minersData[index], ...body };
+            } else {
+                if (minersData.find(x => x.id === body.id)) {
+                    showToast('ID sudah ada!', 'error'); return;
+                }
+                minersData.push(body);
+            }
+            dirty = true;
+            closeMinerModal();
+            renderMiners();
+            showToast(isEdit ? '✅ Diupdate — klik Simpan Semua' : '✅ Ditambah — klik Simpan Semua', 'success');
+        }
+
+        function editMiner(index) { openMinerModal(minersData[index]); }
+
+        function deleteMiner(index) {
+            const m = minersData[index];
+            if (!confirm(`Hapus miner "${m.name}" (${m.id})?`)) return;
+            minersData.splice(index, 1);
+            dirty = true;
+            renderMiners();
+            showToast('🗑️ Dihapus — klik Simpan Semua', 'warning');
+        }
+
+        async function saveAllMiners() {
+            try {
+                const res = await AdminAPI.request('/miner-catalog', {
+                    method: 'PUT',
+                    body: { miners: minersData }
+                });
+                if (res.success) {
+                    dirty = false;
+                    showToast('✅ Miner catalog tersimpan!', 'success');
+                    renderMiners();
+                } else {
+                    showToast('Gagal: ' + (res.message || 'Unknown'), 'error');
+                }
+            } catch (e) {
+                showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        loadMiners();
+    </script>
+</body>
+</html>

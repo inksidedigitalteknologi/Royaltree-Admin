@@ -427,16 +427,7 @@
 
         // ============ SHOP ============
         let shopData = null;
-        let minerCatalogData = null;
-
-        async function loadMinerCatalog() {
-            try {
-                const res = await AdminAPI.request('/miner-catalog');
-                if (res.success) minerCatalogData = res.data;
-            } catch (e) { console.warn('Miner catalog:', e.message); }
-        }
-
-        function renderShop(d) {
+                function renderShop(d) {
             shopData = mergeShopDefaults(d);
             const tiers = d.tiers || {};
             const rtp = d.rtpPacks || {};
@@ -485,21 +476,6 @@
                 </div>`;
             });
             html += '</div></div>';
-            // Miner Speed (Hashrate)
-            if (minerCatalogData && minerCatalogData.miners) {
-                html += '<div class="cfg-section"><div class="cfg-section-title"><i class="bi bi-speedometer2"></i> Miner Speed (Hashrate)</div><div class="cfg-grid">';
-                minerCatalogData.miners.forEach(m => {
-                    html += `<div class="cfg-card">
-                        <div class="cfg-card-header"><span class="cfg-card-emoji">${m.iconEmoji || '⛏️'}</span>
-                        <button class="cfg-card-edit" onclick="editMinerSpeed('${m.id}')"><i class="bi bi-pencil"></i></button></div>
-                        <div class="cfg-card-name">${m.name}</div>
-                        <div class="cfg-card-sub">${m.tier} · ${m.tokenCost} token</div>
-                        <div class="cfg-card-value blue">${formatHashrate(m.powerGhs)}</div>
-                        <div class="cfg-card-note">${m.pointsPerMinute} RTP/menit · +${m.bonusPermanentPct}% bonus</div>
-                    </div>`;
-                });
-                html += '</div></div>';
-            }
             // Bundle
             html += '<div class="cfg-section"><div class="cfg-section-title"><i class="bi bi-gift"></i> Bundles</div><div class="cfg-grid">';
             Object.entries(bundle).forEach(([key, p]) => {
@@ -539,20 +515,7 @@
                 // 1. Simpan shop config
                 const res = await AdminAPI.saveConfig('shop', shopData);
                 if (!res.success) { showToast('Gagal: ' + res.message, 'error'); return; }
-
-                // 2. Simpan miner catalog (speed/hashrate)
-                if (minerCatalogData && minerCatalogData.miners) {
-                    const r2 = await AdminAPI.request('/miner-catalog', {
-                        method: 'PUT',
-                        body: minerCatalogData
-                    });
-                    if (!r2.success) {
-                        showToast('Shop OK, tapi miner gagal: ' + (r2.message || ''), 'error');
-                        return;
-                    }
-                }
-
-                showToast('Shop + Miner Speed saved', 'success');
+                showToast('Shop saved', 'success');
             } catch (e) { showToast('Error: ' + e.message, 'error'); }
         };
 
@@ -713,29 +676,8 @@
                 else showToast('Gagal: ' + res.message, 'error');
             } catch (e) { showToast('Error: ' + e.message, 'error'); }
         };
-
-        
-        window.editMinerSpeed = (id) => {
-            const m = minerCatalogData.miners.find(x => x.id === id);
-            if (!m) return;
-            const display = toDisplayHashrate(m.powerGhs);
-            openModal('Edit ' + m.name, 'Atur speed & hashrate (satuan: ' + display.unit + ')', [
-                { key: 'powerDisplay', label: 'Power (' + display.unit + ')', type: 'number', step: 'any', value: display.value },
-                { key: 'pointsPerMinute', label: 'RTP per menit', type: 'number', step: '0.0001', value: m.pointsPerMinute },
-                { key: 'bonusPermanentPct', label: 'Bonus (%)', type: 'number', step: '0.01', value: m.bonusPermanentPct },
-                { key: 'tokenCost', label: 'Token Cost', type: 'number', value: m.tokenCost }
-            ], (v) => {
-                m.powerGhs = fromDisplayHashrate(v.powerDisplay, display.factor);
-                m.pointsPerMinute = v.pointsPerMinute;
-                m.bonusPermanentPct = v.bonusPermanentPct;
-                m.tokenCost = v.tokenCost;
-                m.pointsPerDay = +(v.pointsPerMinute * 60 * 24).toFixed(3);
-                renderShop(shopData);
-            });
-        };
-
-        // ============ INIT ============
-        loadMinerCatalog(); loadConfig('daily'); loadConfig('ads'); loadConfig('game');
+                // ============ INIT ============
+        loadConfig('daily'); loadConfig('ads'); loadConfig('game');
         loadConfig('shop'); loadConfig('referral'); loadConfig('transfer'); loadConfig('spin');
 
         // System tab — load dari admin stats (bukan config biasa)
