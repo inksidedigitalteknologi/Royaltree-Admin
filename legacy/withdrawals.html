@@ -63,10 +63,10 @@
                     return `
                         <tr>
                             <td><strong>${escapeHtml(w.userName || w.userId || '-')}</strong></td>
-                            <td><strong class="text-gold">${(w.amount || 0).toLocaleString()} RTP</strong></td>
-                            <td>${escapeHtml(w.method || '-')}</td>
+                            <td><strong class="text-gold">${w.currency === 'IDR' ? 'Rp ' + (w.amount || 0).toLocaleString('id-ID') : (w.amount || 0).toLocaleString('id-ID') + ' RTP'}</strong></td>
+                            <td>${escapeHtml(w.providerName || w.channelType || w.method || '-')}</td>
                             <td><span class="badge badge-${statusClass}">${escapeHtml(w.status || '-')}</span></td>
-                            <td class="text-secondary">${w.createdAt ? new Date(w.createdAt).toLocaleDateString('id-ID') : '-'}</td>
+                            <td class="text-secondary">${new Date(w.requestedAt || w.createdAt || Date.now()).toLocaleDateString('id-ID')}</td>
                             <td>
                                 ${w.status === 'PENDING' ? `
                                     <button class="btn btn-sm btn-success" onclick="approveWd('${w.id}')"><i class="bi bi-check"></i></button>
