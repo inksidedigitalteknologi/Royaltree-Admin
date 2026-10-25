@@ -99,6 +99,11 @@
                                     <label class="cfg-modal-label">Max Ads / Day</label>
                                     <input type="number" class="cfg-modal-input" id="ads_maxAdsPerDay">
                                 </div>
+
+                            <div class="cfg-modal-group">
+                                <label class="cfg-modal-label">Reward per Video (RTP)</label>
+                                <input type="number" step="1" class="cfg-modal-input" id="ads_rewardPerVideo">
+                            </div>
                                 <div class="cfg-modal-group">
                                     <label class="cfg-modal-label">AdMob App ID</label>
                                     <input type="text" class="cfg-modal-input" id="ads_admob_appId">
@@ -413,6 +418,7 @@
 
         function renderAds(d) {
             document.getElementById('ads_maxAdsPerDay').value = d.maxAdsPerDay || 20;
+            document.getElementById('ads_rewardPerVideo').value = d.rewardPerVideo || 50;
             document.getElementById('ads_admob_appId').value = (d.admob && d.admob.appId) || '';
             document.getElementById('ads_admob_rewardedUnitId').value = (d.admob && d.admob.rewardedUnitId) || '';
             document.getElementById('ads_maxDisplay').textContent = d.maxAdsPerDay || 20;
@@ -457,6 +463,7 @@
             };
             else if (type === 'ads') body = {
                 maxAdsPerDay: parseInt(document.getElementById('ads_maxAdsPerDay').value) || 20,
+                rewardPerVideo: parseInt(document.getElementById('ads_rewardPerVideo').value) || 50,
                 admob: {
                     appId: document.getElementById('ads_admob_appId').value.trim(),
                     rewardedUnitId: document.getElementById('ads_admob_rewardedUnitId').value.trim()
