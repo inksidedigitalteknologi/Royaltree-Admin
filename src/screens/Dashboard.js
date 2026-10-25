@@ -13,6 +13,9 @@ export function renderDashboard(app) {
           <button data-screen="missions" class="nav-item w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700">🎯 Missions</button>
           <button data-screen="campaigns" class="nav-item w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700">📈 Campaigns</button>
           <button data-screen="audit" class="nav-item w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700">📋 Audit Logs</button>
+          <div class="border-t border-slate-700 my-2"></div>
+          <button data-screen="mining-weights" class="nav-item w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700">⚙️ Mining Weights</button>
+          <button data-screen="fusion-config" class="nav-item w-full text-left px-3 py-2 rounded-lg hover:bg-slate-700">⚗️ Fusion Config</button>
         </nav>
         <button id="logoutBtn" class="mt-6 w-full text-left px-3 py-2 rounded-lg hover:bg-red-700 text-red-400">🚪 Logout</button>
       </aside>
@@ -81,6 +84,12 @@ async function loadScreen(screen) {
           </table>
         </div>
       `
+    } else if (screen === 'mining-weights') {
+      const { renderMiningWeights } = await import('./MiningWeights.js')
+      await renderMiningWeights(content)
+    } else if (screen === 'fusion-config') {
+      const { renderFusionConfig } = await import('./FusionConfig.js')
+      await renderFusionConfig(content)
     } else {
       content.innerHTML = `<div class="text-slate-400">${screen} — coming soon</div>`
     }

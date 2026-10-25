@@ -47,5 +47,15 @@ export const api = {
   }),
   missions: () => apiRequest('/admin/missions'),
   campaigns: () => apiRequest('/admin/campaigns'),
-  auditLogs: () => apiRequest('/admin/audit-logs')
+  auditLogs: () => apiRequest('/admin/audit-logs'),
+  miningWeights: () => apiRequest('/admin/mining-weights'),
+  updateMiningWeights: (data) => apiRequest('/admin/mining-weights', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  }),
+  fusionConfig: () => apiRequest('/admin/fusion-config'),
+  updateFusionConfig: (data) => apiRequest('/admin/fusion-config', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  })
 }

@@ -165,7 +165,9 @@
         shop: '/shop-config',
         referral: '/referral-config',
         transfer: '/transfer-config',
-        spin: '/spin-config'
+        spin: '/spin-config',
+        'mining-weights': '/mining-weights',
+        fusion: '/fusion-config'
       };
       return request(map[type] || '/daily-config');
     },
@@ -177,7 +179,9 @@
         shop: '/shop-config',
         referral: '/referral-config',
         transfer: '/transfer-config',
-        spin: '/spin-config'
+        spin: '/spin-config',
+        'mining-weights': '/mining-weights',
+        fusion: '/fusion-config'
       };
       return request(map[type] || '/daily-config', { method: 'PUT', body });
     },
